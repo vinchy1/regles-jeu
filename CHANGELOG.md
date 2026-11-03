@@ -3,6 +3,13 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.6.0] — 2026-11-03
+### Ajouté
+- Livret introuvable (skill `rechercher`) : au lieu de seulement demander un autre nom ou un lien, la skill
+  propose d'écrire à l'auteur. Elle cherche où le joindre (e-mail publié, formulaire, X…), rédige un court message
+  en anglais demandant le livret en PDF, l'enregistre dans `_outils/<Jeu>/message_auteur.txt` et note le contact
+  dans `NOTES.md` ; l'utilisateur l'envoie lui-même. Méthode : `skills/rechercher/references/ecrire-auteur.md`.
+
 ## [1.5.0] — 2026-11-01
 ### Ajouté
 - Drapeau de la langue remplacé par le drapeau français : réglage `DRAPEAUX` du spec (`[(page, rect, "rond" |

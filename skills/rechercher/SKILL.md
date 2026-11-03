@@ -67,7 +67,9 @@ Seule une page qui nomme le jeu compte. Jeu japonais toujours introuvable : `ref
 ### 3. Faire le point et demander
 Par version : titre / édition, langue, forme, source, officielle ou fan, lien, pages. Même fichier à plusieurs
 endroits = une option (lien de l'éditeur).
-- **Aucune** : dire où et avec quels noms on a cherché, demander un autre nom ou un lien. S'arrêter.
+- **Aucune** : dire où et avec quels noms on a cherché, puis AskUserQuestion : « Écrire à l'auteur » (message en
+  anglais demandant le livret, `references/ecrire-auteur.md`) / « J'ai un lien ou un autre nom » / « Arrêter ».
+  Lien ou nom donné : reprendre à l'étape 1. Sinon s'arrêter après le message ou l'arrêt.
 - **Une seule** : l'annoncer en une ligne et continuer ; si elle n'est pas en français, dire en une ligne où la
   règle française a été cherchée sans succès.
 - **Plusieurs** : liste numérotée et question (AskUserQuestion si ≤ 4, plusieurs possibles), rien téléchargé

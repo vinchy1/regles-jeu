@@ -144,7 +144,9 @@ marquée « recommandé » ; le choix reste le vôtre, et le lien du manuel japo
      fiche, règles récupérées) et y regarde en premier pour les recherches suivantes du même Game Market.
 3. **Faire le point** : pour chaque version, titre / édition, langue, forme (PDF ou page web), source,
    officielle ou de fan, lien. Le même fichier trouvé à plusieurs endroits ne compte qu'une fois.
-   - aucune version → elle dit où et avec quels noms elle a cherché, et vous demande un autre nom ou un lien ;
+   - aucune version → elle dit où et avec quels noms elle a cherché, et vous propose : écrire à l'auteur (elle
+     rédige un court message en anglais demandant le livret et trouve où l'envoyer ; c'est vous qui l'envoyez),
+     donner un autre nom ou un lien, ou arrêter ;
    - une seule → elle l'annonce et continue ;
    - plusieurs → elle vous les présente et attend votre choix (on peut en prendre plusieurs). Rien n'est
      téléchargé avant.

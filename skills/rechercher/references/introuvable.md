@@ -39,5 +39,6 @@ Avant de conclure « aucun résultat » :
 6. **Game Market avec ce titre** : chercher aussi un **mot seul et distinctif** du titre, sans `・` ni espaces
    (`ショーファー` plutôt que `コスモ・ショーファー`). Un mot trop courant (`パレード`, `コスモ`) donne trop de
    résultats.
-7. Toujours rien : dire où et avec quels noms on a cherché, et demander une piste (titre de la boîte,
+7. Toujours rien : dire où et avec quels noms on a cherché, et proposer d'écrire à l'auteur
+   (`ecrire-auteur.md`) ou demander une piste (titre de la boîte,
    éditeur, auteur, lien, vidéo où le jeu apparaît).
