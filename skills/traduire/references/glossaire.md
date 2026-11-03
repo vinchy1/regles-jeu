@@ -23,6 +23,10 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | set / run | série / suite |
 | face up / face down | face visible / face cachée |
 | clockwise | dans le sens horaire |
+| counter-clockwise | dans le sens antihoraire |
+| pair / three-of-a-kind / straight (dés) | paire / brelan / suite |
+| player screen / reroll | paravent / relance, relancer |
+| bet / betting chip / bettor | pari / jeton de pari / parieur |
 | player board / point tokens | plateau joueur / jetons de points |
 | player indicator card / token | carte / jeton Joueur |
 | restriction / binding (JP 縛り) | contrainte (de couleur / de nombre) |
