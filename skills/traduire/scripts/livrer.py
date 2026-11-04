@@ -3,7 +3,8 @@ Usage : python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>" [--langue X] [--e
         python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>" --original "<livret>" --pdf "<français.pdf>"
                [--pdf-en "<anglais.pdf>"] [--type "recréé (…)"] [--langue X] [--editeur Y] [--remplacer]
 
-1. crée <Ludothèque>/<Jeu>/ et y déplace le livret d'origine (s'il est encore dans « A traduire ») ;
+1. crée <Ludothèque>/<Jeu>/ et y déplace le livret d'origine (s'il est encore dans « A traduire ») ; s'il y est
+   déjà à l'identique, la copie restée dans « A traduire » est simplement retirée ;
 2. fait pointer SRC de spec.py sur son nouvel emplacement ;
 3. range et allège le dossier d'outils (ranger.py), reconstruit avec les polices allégées (build.py ou scan.py) ;
 4. copie la sortie en <Jeu>/<nom>_FR.pdf, mention de langue retirée (« Jeu_EN.pdf » → « Jeu_FR.pdf »,
@@ -21,7 +22,7 @@ Avec --pdf (traduction faite sans spec.py : page web recréée en HTML, livret r
 seulement, avec les PDF donnés (--pdf-en : version anglaise, --pdf-encre : version économe en encre) et le Type
 donné à l'index (défaut « recréé »).
 N'écrase jamais un fichier existant dans le dossier du jeu sans --remplacer."""
-import ast, datetime, os, re, shutil, subprocess, sys
+import ast, datetime, filecmp, os, re, shutil, subprocess, sys
 
 HEADER = """# Index des livrets traduits (plugin regles-jeu, skill traduire)
 
@@ -86,14 +87,24 @@ def bilingue(spec_path):
                for n in ast.walk(tree))
 
 
+def identiques(a, b):
+    return os.path.isfile(a) and os.path.isfile(b) and filecmp.cmp(a, b, shallow=False)
+
+
 def deplacer_original(src, target, replace):
     os.makedirs(target, exist_ok=True)
     dest = os.path.join(target, os.path.basename(src))
-    if os.path.normcase(os.path.dirname(src)) != os.path.normcase(target):
+    if os.path.normcase(os.path.dirname(src)) != os.path.normcase(target) and not identiques(src, dest):
         if os.path.exists(dest) and not replace:
-            fail(f"{dest} existe déjà — relancer avec --remplacer")
+            fail(f"{dest} existe déjà, différent du livret traduit — relancer avec --remplacer")
         shutil.move(src, dest)
         print(f"livret d'origine déplacé -> {dest}")
+    # copie identique restée à traiter (livret envoyé à traduire depuis le dossier du jeu) : sans cela il resterait
+    # proposé à la traduction. Seule une copie exacte est retirée : l'exemplaire du dossier du jeu reste.
+    depot = os.path.join(os.path.dirname(target), "A traduire", os.path.basename(dest))
+    if identiques(depot, dest):
+        os.remove(depot)
+        print(f"copie identique retirée de « A traduire » : {os.path.basename(dest)}")
     return dest
 
 
