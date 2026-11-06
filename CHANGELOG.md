@@ -3,6 +3,13 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.6.2] — 2026-11-06
+### Corrigé
+- `build.py` : les lignes d'un tableau ou le bord d'un cadre qui passent juste sous une ligne traduite ne sont plus
+  prises pour un soulignement et restent en place (Mini Express : table des matières et tableau de scores avaient
+  perdu leurs lignes). Un trait qui dépasse le texte de la ligne, ou qui prolonge un trait plus long, est gardé ;
+  `pieges.md` l'explique.
+
 ## [1.6.1] — 2026-11-04
 ### Corrigé
 - `livrer.py` : un livret déjà rangé à l'identique dans le dossier du jeu ne reste plus dans `A traduire` après la

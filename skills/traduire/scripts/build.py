@@ -683,8 +683,14 @@ for pno, flows in sorted(by_page.items()):
                 page.add_redact_annot(r + (-0.3, h * 0.2, 0.3, -h * 0.2))
             for l in raw:  # underlines drawn just below the baseline of a replaced line
                 base, size, bb = l["spans"][0]["origin"][1], l["spans"][0]["size"], l["bbox"]
+                # an underline stays under the line's text; a table rule or frame edge runs past it on a side
+                # (Mini Express: table of contents and scoring table lost their row lines)
+                # (also a piece of a rule drawn in segments: touches a thin line that runs past the text)
+                lo, hi = bb[0] - 0.3 * size, bb[2] + 0.3 * size
                 unders += [u for u in thin if u not in unders and base - 1 <= u.y0 <= base + 0.35 * size
-                           and u.x0 < bb[2] and u.x1 > bb[0]]
+                           and u.x0 < bb[2] and u.x1 > bb[0] and u.x0 >= lo and u.x1 <= hi
+                           and not any(abs(t.y0 - u.y0) < 0.6 and t.x0 <= u.x1 + 1 and t.x1 >= u.x0 - 1
+                                       and (t.x0 < lo or t.x1 > hi) for t in thin)]
             if "fix" not in p:  # numbered step drawn on a badge: keep it on its badge
                 c0 = [c for s in lines[0]["spans"] for c in s["chars"] if c["c"].strip()][0]
                 cc = (pymupdf.Rect(c0["bbox"]).tl + pymupdf.Rect(c0["bbox"]).br) / 2

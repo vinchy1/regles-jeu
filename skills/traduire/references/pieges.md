@@ -39,7 +39,9 @@ La plupart sont déjà gérés par `scripts/build.py` ; ce qui reste à faire da
   règlent dans `CARD_STYLE` (voir `spec_modele.py`).
 - **Mots soulignés** (traits dessinés sous la ligne, pas du texte) : le build retire ceux qui sont sous une
   ligne remplacée (journal : « soulignement(s) d'origine retiré(s) ») ; souligner le français avec
-  `<u>…</u>` et `u {text-decoration:underline;}` dans le CSS du spec.
+  `<u>…</u>` et `u {text-decoration:underline;}` dans le CSS du spec. Un trait qui dépasse le texte de la ligne
+  (ligne d'un tableau, bord d'un cadre) n'est pas un soulignement et reste en place ; si un tableau perd quand
+  même des lignes, ce message dans le journal en est la cause.
 - **Polices du livret complètes** : si `polices.py glyphes` ne signale aucun manque (police embarquée en
   entier), copier simplement l'originale dans `ff/`.
 - **Plusieurs colonnes par page** : détectées seules (blancs verticaux à la hauteur du paragraphe, texte de la
