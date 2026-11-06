@@ -3,6 +3,12 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.6.1] — 2026-11-04
+### Corrigé
+- `livrer.py` : un livret déjà rangé à l'identique dans le dossier du jeu ne reste plus dans `A traduire` après la
+  livraison (il y restait proposé à la traduction). La copie exacte de `A traduire` est retirée, sans `--remplacer` ;
+  un livret différent arrête toujours la livraison.
+
 ## [1.6.0] — 2026-11-03
 ### Ajouté
 - Livret introuvable (skill `rechercher`) : au lieu de seulement demander un autre nom ou un lien, la skill

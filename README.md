@@ -1,7 +1,7 @@
 # regles-jeu
 
 [![Plugin Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-D97757)](https://code.claude.com/docs/fr/plugins)
-[![Version](https://img.shields.io/badge/version-1.5.0-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.6.1-blue)](CHANGELOG.md)
 [![Langue](https://img.shields.io/badge/langue-fran%C3%A7ais-informational)](#)
 
 **Plugin Claude Code pour jouer en français (ou en anglais) à des jeux de société venus d'ailleurs.**
