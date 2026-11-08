@@ -20,7 +20,7 @@ def _spans(page):
     """Boîte « utile » de chaque span : du haut des capitales à la ligne de base (sans interligne ni jambages),
     pour ne pas confondre deux lignes serrées avec un chevauchement."""
     out = []
-    for b in page.get_text("dict")["blocks"]:
+    for b in page.get_text("dict", flags=pymupdf.TEXTFLAGS_DICT & ~pymupdf.TEXT_PRESERVE_IMAGES)["blocks"]:  # sans les images (très lent sur un livret riche en images)
         for l in b.get("lines", []):
             if abs(l["dir"][0] - 1) > 0.01:
                 continue

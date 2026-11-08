@@ -60,7 +60,7 @@ if ENCRE:
         fail("encre.py absent du dossier (option --fond-clair) : le recopier depuis scripts/ de la skill")
 FF = os.path.join(HERE, "ff")
 MARK = "¤"
-BULLET = re.compile(r"^\s*([•●○〇◆◇■□▪▶►・\u2460-\u2473\u2776-\u277f]|\d+\.)\s*")
+BULLET = re.compile(r"^\s*([•●○〇◆◇■□▪▶►・\u2460-\u2473\u2776-\u277f]|\d+\.|[A-Z]\.(?=\s))\s*")  # A. B. C. : étapes lettrées
 
 # ------------------------------------------------------------------ fonts (from the @font-face rules of spec.CSS)
 FACES = {}
