@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "regles-jeu",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "Trouver sur internet puis traduire (FR / EN) les livrets de règles de jeux de société en conservant la mise en page",
   "author": { "name": "vinchy1", "url": "https://github.com/vinchy1" },
   "homepage": "https://github.com/vinchy1/regles-jeu",

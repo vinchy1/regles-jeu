@@ -3,6 +3,12 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.6.3] — 2026-11-09
+### Corrigé
+- Aide-mémoire : les titres gardés en anglais dans le livret traduit (titres décoratifs, comme « Haggis
+  (3-Player) ») ne sont plus recopiés tels quels ; la méthode demande de les écrire en français, et
+  `aide_memoire.py` signale les restes (« À VÉRIFIER : anglais »).
+
 ## [1.6.2] — 2026-11-06
 ### Corrigé
 - `build.py` : les lignes d'un tableau ou le bord d'un cadre qui passent juste sous une ligne traduite ne sont plus

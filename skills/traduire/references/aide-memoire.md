@@ -33,6 +33,11 @@ Règles d'écriture :
 - `**gras**` pour les mots-clés qu'on cherche des yeux (nombres de cartes, conditions de victoire, interdits).
 - Vocabulaire de `references/glossaire.md` et de la traduction du jeu ; noms de cartes et de variantes comme dans
   le livret français (préférences de l'utilisateur).
+- **Titres et phrases toujours en français**, même quand le livret traduit a gardé un titre en anglais (titre
+  décoratif dessiné, noté « non traduit » dans `NOTES.md`) : « Haggis (3-Player) » s'écrit « Haggis à 3 joueurs »,
+  « Setup » « Mise en place ». Seuls restent tels quels les noms propres (jeu, variante comme « Haggis and
+  Tatties », cartes), avec au besoin une précision en français entre parenthèses. `aide_memoire.py` signale les
+  restes repérés (« À VÉRIFIER : anglais ») : les corriger dans le JSON et reconstruire.
 - `infos` : type de jeu, joueurs, durée, âge, tels qu'imprimés sur le livret (ou `_outils/bgg.json` s'il y est).
 - `source` : le livret lu et ses pages (« CMYK_Rules_FR.pdf, p. 1-12 »).
 

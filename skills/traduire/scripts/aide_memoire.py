@@ -173,9 +173,30 @@ def _vignette(livret):
     return h * r.width / r.height, h
 
 
+# restes d'anglais à ne pas recopier du livret (titres décoratifs gardés en anglais dans la traduction, comme
+# « Haggis (3-Player) ») : dans les titres de section, et « N-Player » partout ; les noms de cartes restent permis
+ANGLAIS_TITRE = re.compile(r"\b(?:\d+-?players?|players?|setup|set-up|scoring|variants?|rules?|rounds?|game ?play|"
+                           r"overview|turn order|end of (?:the )?game|components?|how to play|winning)\b", re.I)
+ANGLAIS_PARTOUT = re.compile(r"\b\d+-players?\b", re.I)
+
+
+def _anglais(d):
+    """Restes d'anglais à traduire : [(où, texte)]."""
+    out = []
+    for s in d.get("sections", []):
+        if ANGLAIS_TITRE.search(s.get("titre", "")):
+            out.append(("titre", s["titre"]))
+        for x in s.get("etapes", []) + s.get("points", []) + [" ".join(map(str, r)) for r in s.get("tableau", [])]:
+            if ANGLAIS_PARTOUT.search(x):
+                out.append((f"section « {s.get('titre', '')} »", x))
+    return out
+
+
 def construire(json_path, sortie, livret=None, apercu=None, une_page=False):
     with open(json_path, encoding="utf-8") as f:
         d = json.load(f)
+    for ou, t in _anglais(d):
+        print(f"À VÉRIFIER : anglais dans {ou} : « {t[:80]} » — l'écrire en français (ex. « à 3 joueurs »)")
     polices, archive, corps, titre = _polices()
     sections, taille, pages = _taille(d, polices, archive, corps, titre, une_page)
     livret = livret if livret and os.path.isfile(livret) else None
