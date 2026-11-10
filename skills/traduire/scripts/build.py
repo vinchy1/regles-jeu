@@ -432,7 +432,9 @@ def wrap(html, fam, bold, ital, size, color, lead, align):
 
 def render(rect, html, tag):
     tmp = pymupdf.open()
-    pg = tmp.new_page(width=1000, height=2000)
+    # page de mesure assez large pour le cadre : sur un dépliant (1612 pt, The Six Of VIII), un texte posé au-delà
+    # de 1000 pt tombait hors de la page et « ne produisait rien »
+    pg = tmp.new_page(width=max(1000, rect.x1 + 50), height=2000)
     pg.insert_htmlbox(pymupdf.Rect(rect.x0, 100, rect.x1, 1900), html, css=CSS, archive=ARCH)
     spans = [s for b in pg.get_text("dict")["blocks"] for l in b.get("lines", []) for s in l["spans"]
              if s["text"].strip()]

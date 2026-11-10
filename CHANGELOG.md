@@ -3,6 +3,14 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.6.5] — 2026-11-10
+### Corrigé
+- `build.py` : la page de mesure du texte faisait 1000 pt de large ; sur un livret plus large (dépliant de 1612 pt
+  de The Six Of VIII, livret paysage de 17 Dice Bets), un texte posé au-delà tombait hors de la page et la
+  construction s'arrêtait (« le texte français ne produit rien à l'écran »). La page de mesure prend maintenant la
+  largeur du cadre ; rien ne change pour les livrets de taille habituelle. Correctif d'abord fait à la main dans
+  `_outils/The Six Of VIII/`, reporté ici.
+
 ## [1.6.4] — 2026-11-10
 ### Corrigé
 - `comprimer.py` : la version allégée était illisible dans Acrobat, et ses images noires dans les navigateurs, quand
