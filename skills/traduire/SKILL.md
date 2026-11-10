@@ -77,7 +77,9 @@ un livret à problème est mis de côté et signalé.
    --pdf <fr.pdf> [--pdf-en <en.pdf>] [--pdf-encre <encre.pdf>] --type "<type>"`.
    Termes généraux nouveaux → `references/glossaire.md`. Résumer : fichiers, vocabulaire, compromis.
    - **Livret d'au moins 10 Mo** (`livrer.py` le signale) : proposer une version allégée pour Discord, jamais
-     la faire d'office — `references/alleger.md` ; le livret en pleine qualité est gardé tel quel.
+     la faire d'office — `references/alleger.md` ; le livret en pleine qualité est gardé tel quel. La proposer
+     par une **vraie question** (AskUserQuestion : « Faire une version allégée pour Discord ? », Oui / Non) avant
+     le bilan, pas par une phrase glissée dans le bilan, qui passe inaperçue.
 
 ## Aide-mémoire (à la demande)
 « Fais l'aide-mémoire de <jeu> » : une page A4 en français, deux en recto-verso si le jeu le demande (mise en place, tour de jeu, fin de partie et score,

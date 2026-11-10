@@ -3,6 +3,15 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.6.4] — 2026-11-10
+### Corrigé
+- `comprimer.py` : la version allégée était illisible dans Acrobat, et ses images noires dans les navigateurs, quand
+  le livret avait des images en profil CMJN d'imprimeur (ICC à 4 composantes) : `rewrite_images` les passait en JPEG
+  RVB sans changer leur espace de couleur. Chaque JPEG reçoit maintenant l'espace de ses vraies composantes, et le
+  script refuse d'enregistrer une version qui garderait une incohérence (The Six Of VIII : 73 images sur 75).
+- Livret de plus de 10 Mo : la version allégée est proposée par une vraie question avant le bilan, plus par une
+  phrase en fin de bilan qui passait inaperçue (SKILL.md, `references/alleger.md`).
+
 ## [1.6.3] — 2026-11-09
 ### Corrigé
 - Aide-mémoire : les titres gardés en anglais dans le livret traduit (titres décoratifs, comme « Haggis

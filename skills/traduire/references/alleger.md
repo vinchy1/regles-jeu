@@ -12,11 +12,18 @@ python -X utf8 comprimer.py "<chemin>"
 
 Sous 10 Mo, rien n'est signalé et il n'y a rien à proposer.
 
+**Poser la question, pas l'écrire dans le bilan** : AskUserQuestion « Le livret fait 23 Mo, trop pour Discord.
+Faire une version allégée ? » (Oui / Non), avant le bilan final. Une phrase en fin de bilan (« je peux faire une
+version allégée si… ») passe inaperçue. L'app Règles de jeu propose aussi un bouton qui lance `comprimer.py`
+elle-même.
+
 ## Construire
 ```
 python -X utf8 comprimer.py "<livret.pdf>" [--max 10] [--sortie "<fichier.pdf>"] [--remplacer]
 ```
-Écrit `<nom>_light.pdf` à côté du livret. **Le livret en pleine qualité n'est jamais touché ni remplacé** : la
+Écrit `<nom>_light.pdf` à côté du livret. Les images recompressées en JPEG reçoivent l'espace de couleur de leurs
+vraies composantes (une image d'un profil CMJN d'imprimeur devient RVB) : sinon Acrobat refuse le fichier et les
+navigateurs peignent ces images en noir ; le script le vérifie avant d'enregistrer. **Le livret en pleine qualité n'est jamais touché ni remplacé** : la
 version allégée est un fichier de plus, à n'envoyer que sur Discord. C'est le livret normal qui reste la
 référence, qu'on archive et qu'on imprime.
 
