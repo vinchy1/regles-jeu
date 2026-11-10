@@ -69,7 +69,9 @@ un livret à problème est mis de côté et signalé.
    (sans l'en-tête) + chemins. Rapports = propositions : vérifier chaque point avant de corriger ; petite
    correction → regarder soi-même la seule zone modifiée, sans relancer les agents.
 6. **Livrer** : écrire `NOTES.md` (langue d'origine, éditeur, type, polices, vocabulaire, choix, compromis,
-   astuces ; garder « Sources »), puis `python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>"` (`--remplacer`
+   astuces ; garder « Sources », avec le lien direct vers le livret d'origine traduit — page de l'éditeur, Game
+   Market, BoardGameGeek —, pour qu'un ami qui reprend la traduction retrouve le même livret ; `livrer.py` note
+   son empreinte dans `origine.json`), puis `python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>"` (`--remplacer`
    seulement avec l'accord de l'utilisateur ; `--encre` livre en plus `<nom>_FR_encre.pdf`) : original déplacé
    (déjà dans le dossier du jeu à l'identique : ne pas changer `SRC`, la copie de `A traduire` est retirée),
    `SRC` mis à jour, dossier allégé, reconstruction, `<nom>_FR.pdf` (et `_EN.pdf` si spec bilingue), index.

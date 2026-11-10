@@ -3,6 +3,15 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.6.6] — 2026-11-11
+### Ajouté
+- `livrer.py` note le livret d'origine traduit dans `_outils/<Jeu>/origine.json` (nom, taille, pages, empreinte
+  SHA-256, liens de « Sources ») : un ami qui suit ce dossier d'outils reconnaît le même livret chez lui, même
+  renommé, et sait où le télécharger. Sans lien dans NOTES.md, la livraison le signale.
+- `livrer.py` affiche aussi la ligne « TEXTE NON TRADUIT » de la construction (l'app s'en sert pour dire qu'un
+  livret n'est pas tout à fait celui qu'un ami a traduit).
+- La méthode demande de toujours garder dans « Sources » le lien direct vers le livret d'origine.
+
 ## [1.6.5] — 2026-11-10
 ### Corrigé
 - `build.py` : la page de mesure du texte faisait 1000 pt de large ; sur un livret plus large (dépliant de 1612 pt
