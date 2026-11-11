@@ -644,6 +644,9 @@ for pno, flows in sorted(by_page.items()):
     SEGS = segments(lines_of) if auto else []
     page_gut = gutters(SEGS, XL, XR, src[pno].rect.y0, src[pno].rect.y1) if auto else []
     BADGES = badges(pno)
+    # big pictures of the page (board, illustration): not text, so the gutters above do not see them
+    PICS = [pymupdf.Rect(i["bbox"]) for i in src[pno].get_image_info()
+            if i["bbox"][2] - i["bbox"][0] > 60 and i["bbox"][3] - i["bbox"][1] > 40]
     log.append(f"page {pno} : colonne de texte {XL:.0f}–{XR:.0f}" + (" (auto, colonnes détectées par paragraphe)"
                                                                     if auto else ""))
     all_icons = find_icons(src[pno])
@@ -780,6 +783,15 @@ for pno, flows in sorted(by_page.items()):
                     CR = max(min(CR, min(right) - G), x1)
                 if left:
                     CL = min(max(CL, max(left) + G), x0)
+                # a picture drawn beside the paragraph (Yunnan p4: the board right of the setup steps) is not free
+                # room: the paragraph stops before it, as before a neighbouring column. A background picture under
+                # the paragraph (it starts left of / ends right of the text) does not count.
+                for ib in PICS:
+                    if ib.y0 < py1 and ib.y1 > py0:
+                        if ib.x0 > x0 + 0.5 * (x1 - x0) and ib.x1 > x1 + 40:
+                            CR = max(min(CR, ib.x0 - G), x1)
+                        elif ib.x1 < x1 - 0.5 * (x1 - x0) and ib.x0 < x0 - 40:
+                            CL = min(max(CL, ib.x1 + G), x0)
                 align = p.get("align", "left")
                 if align == "center":
                     cx = (x0 + x1) / 2

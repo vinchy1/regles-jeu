@@ -13,6 +13,9 @@ Usage : python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>" [--langue X] [--e
    (LANGUE=en) et le copie en <Jeu>/<nom>_EN.pdf ;
 Un livret livré qui atteint 10 Mo est signalé : au-delà, il ne passe pas sur Discord, et une version allégée est
 à proposer à l'utilisateur (comprimer.py) — le livret en pleine qualité, lui, reste tel quel.
+Après la construction, `origine.json` note le livret d'origine traduit (nom, taille, pages, empreinte SHA-256 et
+liens de « Sources » de NOTES.md) : un ami qui suit ce dossier d'outils (app « Règles de jeu », traductions
+partagées) reconnaît ainsi le même livret chez lui, même renommé, et sait où le télécharger.
 5. ajoute ou met à jour la ligne du jeu dans l'index _outils/LISEZMOI.md (langue et éditeur : options, sinon lus
    dans NOTES.md) et signale un NOTES.md manquant.
 Avec --encre : construit et livre en plus <nom>_FR_encre.pdf, version économe en encre à imprimer (fond sombre
@@ -22,7 +25,7 @@ Avec --pdf (traduction faite sans spec.py : page web recréée en HTML, livret r
 seulement, avec les PDF donnés (--pdf-en : version anglaise, --pdf-encre : version économe en encre) et le Type
 donné à l'index (défaut « recréé »).
 N'écrase jamais un fichier existant dans le dossier du jeu sans --remplacer."""
-import ast, datetime, filecmp, os, re, shutil, subprocess, sys
+import ast, datetime, filecmp, hashlib, json, os, re, shutil, subprocess, sys
 
 HEADER = """# Index des livrets traduits (plugin regles-jeu, skill traduire)
 
@@ -131,6 +134,33 @@ def indexer(ludo, jeu, tools, typ):
         print(f"ATTENTION : {notes} manque — l'écrire (langue, éditeur, polices, vocabulaire, choix, compromis)")
 
 
+def noter_origine(tools, original):
+    """origine.json : le livret d'origine traduit, pour le retrouver ailleurs (nom, taille, pages, empreinte, liens)."""
+    h = hashlib.sha256()
+    with open(original, "rb") as f:
+        for bloc in iter(lambda: f.read(1 << 20), b""):
+            h.update(bloc)
+    try:
+        import pymupdf
+        with pymupdf.open(original) as d:
+            pages = len(d)
+    except Exception:
+        pages = None
+    notes = os.path.join(tools, "NOTES.md")
+    texte = open(notes, encoding="utf8", errors="replace").read() if os.path.isfile(notes) else ""
+    liens = []
+    for u in re.findall(r"https?://[^\s)>\]»\"'`]+", texte):
+        u = u.rstrip(".,;:")
+        if u not in liens:
+            liens.append(u)
+    with open(os.path.join(tools, "origine.json"), "w", encoding="utf8") as f:
+        json.dump({"fichier": os.path.basename(original), "taille": os.path.getsize(original), "pages": pages,
+                   "sha256": h.hexdigest(), "sources": liens[:8]}, f, ensure_ascii=False, indent=1)
+    if not liens:
+        print("ATTENTION : aucun lien vers le livret d'origine dans NOTES.md (« Sources ») — l'ajouter, pour qu'un "
+              "ami qui reprend cette traduction retrouve le même livret")
+
+
 def livrer_pdf(tools, jeu, ludo, target, replace):
     """Traduction faite sans spec.py : PDF donnés, original déplacé, index."""
     src = os.path.abspath(opt("--original") or fail("--original \"<livret d'origine>\" manque"))
@@ -143,7 +173,7 @@ def livrer_pdf(tools, jeu, ludo, target, replace):
             fail(f"PDF introuvable : {f}")
         if f and os.path.exists(os.path.join(target, f"{stem}_{lg}.pdf")) and not replace:
             fail(f"{os.path.join(target, f'{stem}_{lg}.pdf')} existe déjà — relancer avec --remplacer")
-    deplacer_original(src, target, replace)
+    noter_origine(tools, deplacer_original(src, target, replace))
     for lg, f in pdfs.items():
         if f:
             shutil.copy(f, os.path.join(target, f"{stem}_{lg}.pdf"))
@@ -236,6 +266,11 @@ def main():
     if code or "ERREUR" in out:
         fail("la reconstruction a échoué :\n" + out[-2000:])
     tail = out[out.find("À VÉRIFIER"):] if "À VÉRIFIER" in out else ""
+    # lignes d'origine sans traduction : dites aussi à l'app (reprise d'une traduction d'ami sur un autre livret)
+    non_traduit = next((l for l in out.splitlines() if l.startswith("TEXTE NON TRADUIT")), "")
+    if non_traduit:
+        tail = non_traduit + "\n" + tail
+    noter_origine(tools, dest)
     shutil.copy(os.path.join(tools, "sortie.pdf"), fr_path)
     print(f"traduction -> {fr_path}")
     signaler_poids(fr_path)

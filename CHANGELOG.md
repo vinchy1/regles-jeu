@@ -3,6 +3,30 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.6.8] — 2026-11-11
+### Corrigé
+- `build.py` : les étapes lettrées en début de ligne (`A. `, `B. `, `C. `…, suivies d'une espace) sont reconnues
+  comme des puces, comme `1.`, `2.` : la lettre est gardée et le texte traduit s'aligne après elle. `B.Placez`
+  (sans espace), `A.B.C.` ou un mot ordinaire ne le sont pas.
+- `controle.py` : la lecture du texte n'extrait plus les images (`TEXTFLAGS_DICT & ~TEXT_PRESERVE_IMAGES`) ; sur un
+  livret riche en images, le contrôle était si lent qu'il semblait bloqué. Le texte lu est le même.
+
+## [1.6.7] — 2026-11-11
+### Corrigé
+- `build.py` : une grande image posée à côté d'un paragraphe (plateau, illustration) le borne comme une colonne
+  voisine. Avant, la recherche des colonnes ne voyait que le texte : un paragraphe tenu en colonne étroite à côté
+  d'une image (Yunnan p. 4 : la mise en place à gauche du plateau) s'élargissait en français jusqu'au bord de la
+  page, par-dessus l'image. Une image de fond, sous le texte, ne compte pas.
+
+## [1.6.6] — 2026-11-11
+### Ajouté
+- `livrer.py` note le livret d'origine traduit dans `_outils/<Jeu>/origine.json` (nom, taille, pages, empreinte
+  SHA-256, liens de « Sources ») : un ami qui suit ce dossier d'outils reconnaît le même livret chez lui, même
+  renommé, et sait où le télécharger. Sans lien dans NOTES.md, la livraison le signale.
+- `livrer.py` affiche aussi la ligne « TEXTE NON TRADUIT » de la construction (l'app s'en sert pour dire qu'un
+  livret n'est pas tout à fait celui qu'un ami a traduit).
+- La méthode demande de toujours garder dans « Sources » le lien direct vers le livret d'origine.
+
 ## [1.6.5] — 2026-11-10
 ### Corrigé
 - `build.py` : la page de mesure du texte faisait 1000 pt de large ; sur un livret plus large (dépliant de 1612 pt
