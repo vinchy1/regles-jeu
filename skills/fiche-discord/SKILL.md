@@ -20,9 +20,9 @@ Les fiches doivent ressembler à celles déjà postées dans le salon (même ord
   « Bibliothèque », règles dans le « Guide des posts ». **Claude n'ouvre jamais Discord** (le navigateur piloté
   n'y est pas connecté) : le format est celui de l'étape 4 ; un autre salon demandé : demander son modèle à
   l'utilisateur.
-- `<skill>/scripts/` : `bgg.py` (BoardGameGeek par son API), `boutique_gm.py` (boutique Golden Meeple),
+- `<skill>/scripts/` : `boutique_gm.py` (boutique Golden Meeple),
   `webhook.py` (publication). `fiche_gm.py`
-  (Tokyo Game Market) est celui de la skill rechercher : `<plugin>/skills/rechercher/scripts/fiche_gm.py`.
+  (Tokyo Game Market) et `bgg.py` (BoardGameGeek par son API) sont ceux de la skill rechercher : `<plugin>/skills/rechercher/scripts/fiche_gm.py`.
   `comprimer.py` (version allégée) est celui de la skill traduire : `<plugin>/skills/traduire/scripts/comprimer.py`.
 - **Publication par webhook** : lire `references/webhook.md`, et seulement dans ce cas.
 
@@ -51,7 +51,7 @@ post… ») avant de poster.
 0. **Déjà connu** : `<Ludothèque>/_outils/bgg.json` (clé = nom du dossier du jeu) donne souvent l'identifiant BGG,
    le nom, l'année, les joueurs, l'image et les mécaniques ; une fiche existante (`_outils/<Jeu>/fiche/notes.txt`) donne ses
    sources. Les reprendre, sans relire ce qui est déjà sûr.
-1. **BGG** : `python -I -X utf8 <skill>/scripts/bgg.py chercher "<nom>"` (identifiant connu par `bgg.json` : passer
+1. **BGG** : `python -I -X utf8 <plugin>/skills/rechercher/scripts/bgg.py chercher "<nom>"` (identifiant connu par `bgg.json` : passer
    directement à la fiche), puis `bgg.py fiche <identifiant>` : titre exact, autres noms (écriture japonaise),
    année, joueurs, auteurs, illustrateurs, éditeurs, mécaniques, image. Plusieurs jeux du même nom : celui dont
    l'éditeur ou l'année correspond aux autres sources ; doute → noté. Absent de BGG : courant pour un jeu du

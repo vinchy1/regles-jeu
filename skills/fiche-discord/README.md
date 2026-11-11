@@ -95,7 +95,7 @@ Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu)
 ## D'où viennent les infos
 | Info | Source |
 |---|---|
-| Titre exact, année, joueurs, auteurs, illustrateurs, éditeurs, mécaniques, image | BoardGameGeek, par l'API (`scripts/bgg.py`) ; identifiant déjà connu par `_outils/bgg.json` de l'app quand il y est |
+| Titre exact, année, joueurs, auteurs, illustrateurs, éditeurs, mécaniques, image | BoardGameGeek, par l'API (`bgg.py` de la skill `rechercher`) ; identifiant déjà connu par `_outils/bgg.json` de l'app quand il y est |
 | Lien boutique, noms, image de secours | boutique goldenmeeple.be (`scripts/boutique_gm.py`) |
 | Noms japonais, nombre et format des cartes | fiche du Tokyo Game Market (`fiche_gm.py` de la skill `rechercher`) |
 | Vidéo de règles | chaîne YouTube Golden Meeple, vidéos « <Jeu> \| LA REGLE » |
@@ -154,11 +154,10 @@ synchronisée sur GitHub) ; toujours un essai d'abord, et rien n'est envoyé san
 |---|---|
 | `SKILL.md` | la méthode suivie par Claude |
 | `references/webhook.md` | mise en place et utilisation d'un webhook (lu seulement dans ce cas) |
-| `scripts/bgg.py` | BoardGameGeek par son API : `chercher "<nom>"`, `fiche <identifiant>` |
 | `scripts/boutique_gm.py` | boutique Golden Meeple : `chercher "<nom>"`, `fiche <lien>` |
 | `scripts/webhook.py` | essai (contrôle du titre, du message, des pièces jointes et de l'adresse), puis `--envoyer` |
 
-Elle s'appuie aussi sur `fiche_gm.py` (skill `rechercher`) et `comprimer.py` (skill `traduire`).
+Elle s'appuie aussi sur `fiche_gm.py` et `bgg.py` (skill `rechercher`) et `comprimer.py` (skill `traduire`).
 
 ---
 

@@ -53,9 +53,11 @@ société, de cartes ou autre.
    ```
 3. **Google Chrome ou Microsoft Edge** installé : il sert, en arrière-plan et avec un profil temporaire, à mettre
    les pages web en PDF. Votre navigateur habituel, vos onglets et vos connexions ne sont pas touchés.
-4. **Facultatif mais conseillé** : l'extension **Claude in Chrome** : elle permet de lire les pages de
-   BoardGameGeek (qui refusent la lecture simple) et de télécharger un fichier qui demande d'être connecté,
-   avec votre propre session.
+4. **Facultatif mais conseillé** : une **clé de l'API BoardGameGeek** (gratuite, compte BGG → *API applications* ;
+   celle de l'app Règles de jeu sert d'office, sinon la variable `BGG_TOKEN`) : le jeu est trouvé sur BGG par son
+   API, car le site bloque les navigateurs pilotés (vérification anti-robots de Cloudflare). Et l'extension
+   **Claude in Chrome** : seul votre propre Chrome passe cette vérification pour l'onglet « Files » et les fichiers
+   qui demandent d'être connecté ; sans elle, Claude vous donne le lien de l'onglet « Files » à ouvrir vous-même.
 5. **Dossier de dépôt** : celui de la skill de traduction, `A traduire` dans votre ludothèque. Notez son chemin
    dans un `CLAUDE.md` à la racine de la ludothèque (par exemple « les PDF à traduire sont déposés dans
    `A traduire/` »). S'il n'est noté nulle part, Claude le demande la première fois et propose de le noter.
@@ -123,8 +125,8 @@ marquée « recommandé » ; le choix reste le vôtre, et le lien du manuel japo
    liens vers le blog Game Market (« les règles sont ici ») et les mentions d'une autre langue (« English
    Manual » sans lien), à suivre avec `fiche_gm.py page <lien>` qui lit une page de blog ou note.com (liens
    Drive / Notion / PDF, images). Il liste aussi tous les jeux d'un cercle (`fiche_gm.py cercle <numéro>`).
-2. **Compléter** : Game Market avec les autres titres lus sur les sources, BoardGameGeek (onglet « Files », par
-   le navigateur), site de l'éditeur, autres recherches web (`rules pdf`, `説明書`, `ルール`, `Spielregel`…).
+2. **Compléter** : Game Market avec les autres titres lus sur les sources, BoardGameGeek (le jeu par l'API ; l'onglet
+   « Files » par votre Chrome, sinon son lien vous est donné), site de l'éditeur, autres recherches web (`rules pdf`, `説明書`, `ルール`, `Spielregel`…).
    Les « vous vouliez peut-être dire… » des moteurs de recherche sont ignorés : seule compte une page qui nomme
    le jeu. Les aperçus IA (Google…) que vous lui donnez sont traités comme des pistes, vérifiées sur les
    sources.
@@ -289,8 +291,9 @@ sont lues en texte plutôt qu'en captures d'écran, pour la même raison.
 ---
 
 ## Limites connues
-- **BoardGameGeek** refuse la lecture simple de ses pages : sans l'extension Claude in Chrome, ses fichiers ne
-  sont pas consultables, et ceux qui demandent d'être connecté doivent être téléchargés à la main.
+- **BoardGameGeek** bloque la lecture simple et les navigateurs pilotés (Cloudflare) : le jeu passe par l'API (clé
+  BGG), mais l'onglet « Files » ne se lit qu'avec l'extension Claude in Chrome ; sans elle, Claude donne son lien et
+  les fichiers sont à télécharger à la main.
 - **Jeux tout juste sortis** (dernier Game Market) : souvent absents de BoardGameGeek et des moteurs de
   recherche ; la fiche Game Market est alors la meilleure source. Si elle n'a que le titre japonais, la
   recherche passe par les vidéos de présentation (extension Claude in Chrome nécessaire).

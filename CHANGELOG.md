@@ -3,6 +3,12 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.7.1] — 2026-11-11
+### Corrigé
+- `rechercher` : BoardGameGeek n'est plus ouvert dans le navigateur piloté (bloqué par la vérification anti-robots de
+  Cloudflare) : le jeu est trouvé par l'API officielle (`scripts/bgg.py`, déplacé de `fiche-discord`, qui l'utilise
+  toujours) ; l'onglet « Files » passe par le Chrome de l'utilisateur, sinon son lien lui est donné.
+
 ## [1.7.0] — 2026-11-11
 ### Ajouté
 - Skill **`fiche-discord`** (reprise du dépôt `fiche-jeu-discord`) : fiche de présentation d'un jeu pour le salon

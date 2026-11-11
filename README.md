@@ -1,7 +1,7 @@
 # regles-jeu
 
 [![Plugin Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-D97757)](https://code.claude.com/docs/fr/plugins)
-[![Version](https://img.shields.io/badge/version-1.7.0-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.7.1-blue)](CHANGELOG.md)
 [![Langue](https://img.shields.io/badge/langue-fran%C3%A7ais-informational)](#)
 
 **Plugin Claude Code pour jouer en français (ou en anglais) à des jeux de société venus d'ailleurs.**
@@ -101,8 +101,8 @@ Créez un dossier `A traduire` dans votre ludothèque, ouvrez Claude Code dans l
 | Python 3 + `pymupdf`, `fonttools`, `lxml` | lire et écrire les PDF, polices, pages web | oui |
 | `pyspellchecker` | contrôle d'orthographe de la relecture | non |
 | Google Chrome ou Microsoft Edge | mise en PDF des pages web (profil temporaire, votre navigateur n'est pas touché) | pour les règles en ligne |
-| Extension **Claude in Chrome** | lire BoardGameGeek, télécharger un fichier qui demande d'être connecté | conseillé |
-| Clé de l'API BoardGameGeek (gratuite, sur boardgamegeek.com) | infos BGG de la fiche Discord (`BGG_TOKEN`, ou la clé enregistrée dans l'app Règles de jeu) | pour `fiche-discord` |
+| Extension **Claude in Chrome** | onglet « Files » de BoardGameGeek, télécharger un fichier qui demande d'être connecté | conseillé |
+| Clé de l'API BoardGameGeek (gratuite, sur boardgamegeek.com) | trouver le jeu sur BGG (recherche, fiche Discord) : `BGG_TOKEN`, ou la clé enregistrée dans l'app Règles de jeu | conseillé |
 | Windows + module de lecture de la langue (OCR) | lecture automatique des livrets scannés | non (sinon lecture en images, plus coûteuse) |
 
 Détails, dont l'installation du module de lecture du japonais : [prérequis de traduire](skills/traduire/README.md#installation).
@@ -246,8 +246,8 @@ Les changements de chaque version sont dans le [CHANGELOG](CHANGELOG.md).
 | Les skills apparaissent en double | le plugin est à la fois cloné et installé depuis la boutique : `claude plugin disable regles-jeu@regles-jeu` (ou supprimer le clone) |
 | Les relecteurs ne sont pas trouvés | ouvrir une nouvelle session ou taper `/reload-plugins` ; vérifier `claude plugin details regles-jeu` |
 | `ModuleNotFoundError: pymupdf` (ou `fontTools`, `lxml`) | relancer `pip install pymupdf fonttools lxml` avec le Python utilisé par Claude (noter son chemin dans le `CLAUDE.md` de la ludothèque) |
-| BoardGameGeek refuse la lecture | recherche de livret : installer l'extension Claude in Chrome ; fiche Discord : elle passe par l'API, il lui faut une clé BGG (`BGG_TOKEN` ou l'app Règles de jeu) |
-| Page « Vérification de sécurité » (Cloudflare) sur BoardGameGeek | normal dans le navigateur piloté par Claude, même en cochant la case : la fiche Discord lit BGG par l'API |
+| BoardGameGeek refuse la lecture | le jeu passe par l'API : il faut une clé BGG (`BGG_TOKEN` ou l'app Règles de jeu) ; l'onglet « Files » demande l'extension Claude in Chrome, sinon Claude donne son lien |
+| Page « Vérification de sécurité » (Cloudflare) sur BoardGameGeek | normal dans le navigateur piloté par Claude, même en cochant la case : depuis la 1.7.1, ni la recherche ni la fiche Discord ne l'ouvrent (API, ou lien donné) |
 | La fiche Discord signale un livret « trop lourd » | Discord sans boost refuse les fichiers de plus de 10 Mo : faire la version allégée (« Il est trop lourd pour Discord ») ; la fiche la prend ensuite d'elle-même |
 | Ancienne skill `fiche-jeu-discord` encore présente | la supprimer de `~/.claude/skills/` : `fiche-discord` la remplace |
 | La version allégée reste au-dessus de 10 Mo | livret presque entièrement fait de grandes images : l'envoyer en deux fichiers (deux moitiés de pages) |

@@ -1,8 +1,11 @@
 # Téléchargements difficiles
 
 ## BoardGameGeek
-- Lecture simple refusée (403), et le navigateur intégré bute sur la vérification anti-robot : passer par Chrome
-  (l'utilisateur y est connecté), lire les pages en texte.
+- Le jeu (identifiant, noms, éditeur) : `bgg.py` (API officielle, clé BGG de l'app ou `BGG_TOKEN`).
+- Les pages du site : lecture simple refusée (403), et un navigateur piloté (outil de navigation de Claude Code)
+  bute sur la vérification anti-robots de Cloudflare, même si l'utilisateur coche la case : ne pas insister ni
+  chercher à la contourner. Seul le Chrome de l'utilisateur (extension Claude in Chrome) passe ; sans lui, donner à
+  l'utilisateur le lien de l'onglet « Files » à ouvrir lui-même, et poursuivre avec les autres sources.
 - Onglet « Files » : `/boardgame/NNN/<nom>/files`. Jeu du dernier Game Market souvent absent : une recherche
   vide suffit. Distinguer règles officielles et traductions / aides de fan (déposant, date ; plusieurs langues
   déposées ensemble le même jour = probablement l'équipe).

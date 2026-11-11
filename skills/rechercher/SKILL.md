@@ -10,7 +10,7 @@ L'utilisateur parle français et ne touche pas aux scripts. Réponds-lui en fran
 ## Réglage
 - **Dossier d'enregistrement** : `<Ludothèque>/A traduire/` (noté dans le `CLAUDE.md` de l'utilisateur ; sinon
   le demander une fois et proposer de le noter).
-- `<skill>/scripts/` : `fiche_gm.py` (Game Market), `telecharger.py` (PDF, images, Drive), `page_pdf.py` (pages
+- `<skill>/scripts/` : `fiche_gm.py` (Game Market), `bgg.py` (BoardGameGeek par son API), `telecharger.py` (PDF, images, Drive), `page_pdf.py` (pages
   web → PDF), `notion_html.py`. `<skill>/references/` : à lire seulement dans le cas indiqué.
   Plusieurs jeux d'un coup : `references/plusieurs-jeux.md`.
 
@@ -50,8 +50,11 @@ anglaise demandée pour un jeu déjà en français : chercher d'abord une versio
 ### 2. Compléter (recherches indépendantes dans le même message)
 1. Game Market avec les autres noms **lus** sur une source ; règles souvent sur Google Drive, le X ou la
    boutique `*.booth.pm` du cercle.
-2. **BoardGameGeek** par Chrome, onglet « Files » — `references/telechargement.md` : regarder d'abord les
-   fichiers en français (langue French, « règles », « VF »).
+2. **BoardGameGeek** — `references/telechargement.md` : le jeu par l'API, `python -I -X utf8 <skill>/scripts/bgg.py
+   chercher "<nom>"` puis `fiche <id>` (noms, éditeur, année), **jamais par le navigateur piloté** (bloqué par la
+   vérification anti-robots de Cloudflare : ne pas insister). Onglet « Files » : seulement dans le Chrome de
+   l'utilisateur (extension Claude in Chrome) ; sinon lui donner le lien `https://boardgamegeek.com/boardgame/<id>/x/files`
+   à ouvrir dans son navigateur, et continuer avec les autres sources. Regarder d'abord les fichiers en français.
 3. **Site de l'éditeur ou du cercle**, toujours, même sans lien sur la fiche : le trouver par la fiche, les
    « Sites du cercle » de `fiche` (boutique BOOTH), la bio du X ou la recherche web, puis y ouvrir **la page du
    jeu** (téléchargements, support, « rules », règles en HTML) avec `fiche_gm.py page "<lien>"` : liens PDF / Drive
