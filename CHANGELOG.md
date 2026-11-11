@@ -3,6 +3,17 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.7.0] — 2026-11-11
+### Ajouté
+- Skill **`fiche-discord`** (reprise du dépôt `fiche-jeu-discord`) : fiche de présentation d'un jeu pour le salon
+  forum *discussion-par-titre* du Discord Golden Meeple (auteurs, liens BGG / boutique / LEX PLI / Game Market, type,
+  cartes, couverture), rangée avec les outils du jeu : `<Ludothèque>/_outils/<Jeu>/fiche/` (`titre.txt`,
+  `message.txt`, `notes.txt`, `couverture.*`, `fiche.json`), synchronisée avec eux. Livrets pris dans le dossier du jeu, sans copie :
+  anglais (ou VO) et français, tous joints au message du post ; BoardGameGeek lu par son API (`bgg.py`, clé BGG
+  de l'app) et non par le navigateur, que Cloudflare bloque ; version allégée au-delà de 10 Mo. Publication à la main par
+  défaut ; `webhook.py` prêt pour le jour où un admin crée un webhook (adresse dans
+  `~/.claude/regles-jeu/discord-webhook.txt`, hors de la ludothèque synchronisée).
+
 ## [1.6.8] — 2026-11-11
 ### Corrigé
 - `build.py` : les étapes lettrées en début de ligne (`A. `, `B. `, `C. `…, suivies d'une espace) sont reconnues

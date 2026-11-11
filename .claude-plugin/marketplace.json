@@ -5,13 +5,13 @@
     "url": "https://github.com/vinchy1"
   },
   "metadata": {
-    "description": "Plugin regles-jeu : trouver et traduire les livrets de règles de jeux de société"
+    "description": "Plugin regles-jeu : trouver et traduire les livrets de règles de jeux de société, et préparer leur fiche Discord"
   },
   "plugins": [
     {
       "name": "regles-jeu",
       "source": "./",
-      "description": "Trouver sur internet puis traduire (FR / EN) les livrets de règles de jeux de société en conservant la mise en page"
+      "description": "Trouver sur internet puis traduire (FR / EN) les livrets de règles de jeux de société en conservant la mise en page, et préparer leur fiche pour un forum Discord"
     }
   ]
 }

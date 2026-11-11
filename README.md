@@ -1,12 +1,13 @@
 # regles-jeu
 
 [![Plugin Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-D97757)](https://code.claude.com/docs/fr/plugins)
-[![Version](https://img.shields.io/badge/version-1.6.7-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.7.0-blue)](CHANGELOG.md)
 [![Langue](https://img.shields.io/badge/langue-fran%C3%A7ais-informational)](#)
 
 **Plugin Claude Code pour jouer en français (ou en anglais) à des jeux de société venus d'ailleurs.**
 Donnez le nom d'un jeu : Claude trouve son livret de règles sur internet, l'enregistre en PDF, puis le traduit
-**en gardant exactement la mise en page** (polices, illustrations, icônes, encadrés).
+**en gardant exactement la mise en page** (polices, illustrations, icônes, encadrés). Il prépare aussi la
+**fiche de présentation** du jeu pour un forum Discord de joueurs, livrets anglais et français joints.
 
 > « Trouve-moi les règles de Hyakuju Parade » → livret anglais officiel téléchargé →
 > « Oui, traduis-le » → `HYAKUJU_PARADE_English_Rulebook_FR.pdf`, prêt à imprimer.
@@ -41,6 +42,8 @@ flowchart LR
     C --> D["traduire<br/>FR, et EN si demandé"]
     D --> E["Relecture<br/>texte + visuel"]
     E --> F["&lt;Jeu&gt;/livret_FR.pdf<br/>+ index de la ludothèque"]
+    F --> G["fiche-discord<br/>BGG, boutique, LEX PLI"]
+    G --> H["&lt;Jeu&gt;/fiche/<br/>post Discord prêt à coller"]
 ```
 
 **Recherche** ([`rechercher`](skills/rechercher/README.md))
@@ -62,6 +65,18 @@ flowchart LR
   texte foncé, illustrations intactes — livrée à côté du livret normal, qui reste la référence.
 - Contrôles automatiques (débordements, texte oublié, orthographe) et relecture par deux agents dédiés.
 - Range le résultat à côté de l'original et tient à jour l'index de la ludothèque.
+
+**Fiche Discord** ([`fiche-discord`](skills/fiche-discord/README.md))
+- Prépare le post qui présente un jeu dans un salon forum Discord — par défaut *discussion-par-titre* du serveur
+  Golden Meeple, au format de son post « Bibliothèque » : titre BGG exact, auteur / illustrateur / éditeur /
+  joueurs / année, liens BoardGameGeek, boutique Golden Meeple, vidéo LEX PLI et Tokyo Game Market, type de jeu,
+  nombre et format des cartes.
+- Lit BoardGameGeek par son **API officielle** (clé BGG personnelle) : le site bloque les navigateurs pilotés.
+- Joint la couverture et les livrets **déjà dans le dossier du jeu**, anglais (ou VO) puis français, tous dans le
+  même message ; prend d'elle-même la version allégée d'un livret de plus de 10 Mo.
+- Range la fiche avec les outils du jeu, dans `_outils/<Jeu>/fiche/` (synchronisée avec eux), sans recopier les PDF. N'ouvre jamais Discord et ne
+  publie rien : vous postez à la main (l'app Règles de jeu copie chaque élément d'un clic), ou plus tard par un
+  webhook créé par un admin du serveur.
 
 Testé sur plus de vingt livrets, dont Trick Jack, Hit and Win, Monochrome Overtime, Kajitsu Tobu, CMYK,
 The Good Farmer, Poker Avoces, Shinobi Blade et Man Eating House.
@@ -87,6 +102,7 @@ Créez un dossier `A traduire` dans votre ludothèque, ouvrez Claude Code dans l
 | `pyspellchecker` | contrôle d'orthographe de la relecture | non |
 | Google Chrome ou Microsoft Edge | mise en PDF des pages web (profil temporaire, votre navigateur n'est pas touché) | pour les règles en ligne |
 | Extension **Claude in Chrome** | lire BoardGameGeek, télécharger un fichier qui demande d'être connecté | conseillé |
+| Clé de l'API BoardGameGeek (gratuite, sur boardgamegeek.com) | infos BGG de la fiche Discord (`BGG_TOKEN`, ou la clé enregistrée dans l'app Règles de jeu) | pour `fiche-discord` |
 | Windows + module de lecture de la langue (OCR) | lecture automatique des livrets scannés | non (sinon lecture en images, plus coûteuse) |
 
 Détails, dont l'installation du module de lecture du japonais : [prérequis de traduire](skills/traduire/README.md#installation).
@@ -144,6 +160,7 @@ Les skills se déclenchent seules d'après votre demande ; les commandes directe
 | « Dans Merge Take, remplace "la plus forte" par "de plus haute valeur" » | correction d'une traduction déjà livrée |
 | « Ce livret est tout noir, je vais l'imprimer » | version économe en encre, en plus du livret normal |
 | « Il est trop lourd pour Discord » | version allégée sous 10 Mo, le livret d'origine étant conservé |
+| « Fais la fiche Discord de The Good Farmer » | fiche du salon Golden Meeple dans `_outils/<Jeu>/fiche/`, prête à coller |
 
 Exemple réel :
 > **Vous** : /regles-jeu:rechercher Hyakuju Parade
@@ -154,7 +171,7 @@ Exemple réel :
 > fichier de l'éditeur). Liens gardés dans `_outils\Hyakuju Parade\NOTES.md`. Voulez-vous que je le traduise ?
 
 Guides complets : [rechercher](skills/rechercher/README.md#utilisation) ·
-[traduire](skills/traduire/README.md#utilisation).
+[traduire](skills/traduire/README.md#utilisation) · [fiche-discord](skills/fiche-discord/README.md#utilisation).
 
 ---
 
@@ -163,6 +180,7 @@ Guides complets : [rechercher](skills/rechercher/README.md#utilisation) ·
 |---|---|---|---|
 | `rechercher` | skill | trouve et télécharge le livret | celui de la session |
 | `traduire` | skill | traduit et met en page | celui de la session |
+| `fiche-discord` | skill | prépare la fiche du jeu pour un forum Discord (Golden Meeple) | celui de la session |
 | `regles-jeu:relecteur-texte` | agent | relit la traduction (contresens, oublis, vocabulaire, fautes) | Sonnet |
 | `regles-jeu:relecteur-visuel` | agent | compare chaque page à l'original | Sonnet |
 
@@ -171,7 +189,8 @@ Guides complets : [rechercher](skills/rechercher/README.md#utilisation) ·
 agents/           les deux relecteurs
 skills/
 ├── rechercher/   SKILL.md, references/ (cas particuliers), scripts/ (Game Market, téléchargement, pages web)
-└── traduire/     SKILL.md, references/, scripts/ (préparation, construction, contrôles, livraison), exemples/
+├── traduire/     SKILL.md, references/, scripts/ (préparation, construction, contrôles, livraison), exemples/
+└── fiche-discord/ SKILL.md, references/ (webhook), scripts/ (boutique Golden Meeple, webhook)
 CHANGELOG.md      historique des versions
 ```
 
@@ -181,12 +200,17 @@ CHANGELOG.md      historique des versions
 ```
 <Ludothèque>/
 ├── A traduire/          PDF déposés, en attente de traduction
-├── <Jeu>/               livrets seulement : original, _FR.pdf, _EN.pdf
+├── <Jeu>/               livrets : original, _FR.pdf, _EN.pdf (et _light.pdf, _encre.pdf, _aide-memoire.pdf)
 └── _outils/
     ├── LISEZMOI.md      index des jeux traduits (une ligne par jeu)
     └── <Jeu>/           outils du jeu (spec, polices, NOTES.md avec les liens et les choix)
+        └── fiche/       fiche Discord : titre.txt, message.txt, notes.txt, couverture.*, fiche.json
 ```
-Le dossier d'outils de chaque jeu est conservé pour pouvoir corriger une traduction plus tard.
+Le dossier d'outils de chaque jeu est conservé pour pouvoir corriger une traduction plus tard. Le sous-dossier
+`fiche/` ne contient pas de livret : `fiche.json` nomme ceux du dossier du jeu à joindre ; il n'est jamais touché par
+le rangement des outils de traduction. L'adresse d'un éventuel
+webhook Discord se range hors de la ludothèque (qui peut être synchronisée sur GitHub) :
+`~/.claude/regles-jeu/discord-webhook.txt`.
 
 ---
 
@@ -196,6 +220,7 @@ Le dossier d'outils de chaque jeu est conservé pour pouvoir corriger une traduc
 | Plugin installé, inutilisé | ~650 jetons par session (descriptions des skills et des agents) |
 | Recherche d'un jeu | quelques dizaines de milliers de jetons |
 | Traduction d'un livret de quelques pages | 150 000 à 200 000 jetons ; davantage pour un scan ou un long livret |
+| Fiche Discord d'un jeu | quelques dizaines de milliers de jetons (recherches web, aucun livret relu) |
 
 Les scripts font le travail mécanique, les images ne sont regardées qu'à bon escient et les relectures tournent
 sur Sonnet dans des agents séparés. Pour changer leur modèle : ligne `model:` des fichiers de `agents/`.
@@ -221,7 +246,10 @@ Les changements de chaque version sont dans le [CHANGELOG](CHANGELOG.md).
 | Les skills apparaissent en double | le plugin est à la fois cloné et installé depuis la boutique : `claude plugin disable regles-jeu@regles-jeu` (ou supprimer le clone) |
 | Les relecteurs ne sont pas trouvés | ouvrir une nouvelle session ou taper `/reload-plugins` ; vérifier `claude plugin details regles-jeu` |
 | `ModuleNotFoundError: pymupdf` (ou `fontTools`, `lxml`) | relancer `pip install pymupdf fonttools lxml` avec le Python utilisé par Claude (noter son chemin dans le `CLAUDE.md` de la ludothèque) |
-| BoardGameGeek refuse la lecture | installer l'extension Claude in Chrome |
+| BoardGameGeek refuse la lecture | recherche de livret : installer l'extension Claude in Chrome ; fiche Discord : elle passe par l'API, il lui faut une clé BGG (`BGG_TOKEN` ou l'app Règles de jeu) |
+| Page « Vérification de sécurité » (Cloudflare) sur BoardGameGeek | normal dans le navigateur piloté par Claude, même en cochant la case : la fiche Discord lit BGG par l'API |
+| La fiche Discord signale un livret « trop lourd » | Discord sans boost refuse les fichiers de plus de 10 Mo : faire la version allégée (« Il est trop lourd pour Discord ») ; la fiche la prend ensuite d'elle-même |
+| Ancienne skill `fiche-jeu-discord` encore présente | la supprimer de `~/.claude/skills/` : `fiche-discord` la remplace |
 | La version allégée reste au-dessus de 10 Mo | livret presque entièrement fait de grandes images : l'envoyer en deux fichiers (deux moitiés de pages) |
 | La version économe en encre garde des zones sombres | lire le journal : fond posé avec une matrice tournée (« À VÉRIFIER ») ou couleurs en ton direct, laissées intactes ; un livret scanné n'est pas couvert |
 | Scan japonais non lu automatiquement | installer le module de lecture du japonais : [prérequis de traduire](skills/traduire/README.md#installation) |
@@ -236,9 +264,12 @@ Les changements de chaque version sont dans le [CHANGELOG](CHANGELOG.md).
 - Testé sous Windows ; la lecture automatique des scans est propre à Windows.
 - Version économe en encre : pour les livrets à texte et les livrets recomposés, pas pour les scans (le fond y est
   l'image scannée elle-même).
+- Fiche Discord : les doublons (jeu déjà présenté dans le salon) ne sont pas vérifiés, Claude n'ouvrant jamais
+  Discord ; la publication par webhook attend qu'un admin du serveur en crée un ; le webhook ne sait ni épingler
+  le post ni poser les étiquettes du forum.
 
 Listes complètes : [rechercher](skills/rechercher/README.md#limites-connues) ·
-[traduire](skills/traduire/README.md#limites-connues).
+[traduire](skills/traduire/README.md#limites-connues) · [fiche-discord](skills/fiche-discord/README.md#limites-connues).
 
 ---
 
