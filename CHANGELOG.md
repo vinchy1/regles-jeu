@@ -3,6 +3,17 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.7.2] — 2026-11-16
+### Corrigé
+- `controle.py` : le contrôle « chevauche une image » ne regarde plus les rectangles des images mais les pixels du
+  décor sous chaque ligne française (page construite sans son texte) : papier, fonds et aplats sont ignorés, une
+  légende qui mord de quelques points sur une illustration, une flèche ou une icône est signalée (« chevauche un
+  dessin (N pt) »), et ce que l'original pose déjà sur un dessin ne compte pas. Sur OSTIA (fond fait de grandes
+  images), 340 alertes presque toutes fausses, qui noyaient les légendes posées sur la tuile de ville et une
+  remarque débordant sur la carte, deviennent 9 alertes, toutes vraies.
+- Relecteur visuel : zoom sur chaque légende placée autour d'une illustration (étendue comparée à l'original), et
+  sur toute alerte « chevauche un dessin » ; jusqu'à 12 zooms.
+
 ## [1.7.1] — 2026-11-11
 ### Corrigé
 - `rechercher` : BoardGameGeek n'est plus ouvert dans le navigateur piloté (bloqué par la vérification anti-robots de
