@@ -202,6 +202,7 @@ for _p in doc:
         log.append(f"page {_p.number} : flux protégé pour les redactions ({_n} passage(s) à la ligne T* / ' / \", "
                    f"{_m} masque(s) vide(s))")
 used = set()  # (page, block, line) replaced by a translation
+ZAPS = {}  # page -> zones whose text is removed (redactions), to find kept text erased with them
 
 
 def fcode(s):
@@ -685,7 +686,9 @@ for pno, flows in sorted(by_page.items()):
             lifted += mine
             for r in allrects:
                 h = r.height
-                page.add_redact_annot(r + (-0.3, h * 0.2, 0.3, -h * 0.2))
+                z = r + (-0.3, h * 0.2, 0.3, -h * 0.2)
+                page.add_redact_annot(z)
+                ZAPS.setdefault(pno, []).append(z)
             for l in raw:  # underlines drawn just below the baseline of a replaced line
                 base, size, bb = l["spans"][0]["origin"][1], l["spans"][0]["size"], l["bbox"]
                 # an underline stays under the line's text; a table rule or frame edge runs past it on a side
@@ -727,6 +730,7 @@ for pno, flows in sorted(by_page.items()):
     tilted = tilted_lines(page, pno)  # spec.INCLINEES
     for l, fr in tilted:
         page.add_redact_annot(pymupdf.Rect(l["bbox"]), fill=False)
+        ZAPS.setdefault(pno, []).append(pymupdf.Rect(l["bbox"]))
     if tilted:
         page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE, graphics=pymupdf.PDF_REDACT_LINE_ART_NONE)
     unpaint_outlines(page, pno, log)
@@ -890,7 +894,9 @@ for pno, flows in sorted(by_page.items()):
         for g, ic in zip(mine, pl["icons"]):
             groups.remove(g)
             r = g[0]
-            page.add_redact_annot(pymupdf.Rect(r.x0 + 0.3, g[1] - g[2] * 0.35, r.x1 - 0.3, g[1] - g[2] * 0.1))
+            z = pymupdf.Rect(r.x0 + 0.3, g[1] - g[2] * 0.35, r.x1 - 0.3, g[1] - g[2] * 0.1)
+            page.add_redact_annot(z)
+            ZAPS.setdefault(pno, []).append(z)
             ic["draw"] = (ic, (r.x0 + r.x1) / 2, g[1] + ic["off"] * pl["size"], k)
     page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE,
                           graphics=pymupdf.PDF_REDACT_LINE_ART_NONE,
@@ -931,6 +937,79 @@ else:
 if numbers:
     log.append(f"({numbers} ligne(s) sans lettres non remplacée(s) : numéros de page, chiffres, symboles.)")
 out = pymupdf.open(OUT)
+# Kept text (title of the game, IGNORE, numbers) erased with a neighbouring replaced line: a redaction removes
+# every character whose box touches its zone, and a big display font has boxes far taller than its letters
+# (Shuffle and Swing: erasing « RULEBOOK » took the U F F of the 74 pt « SHUFFLE » just below). Reported: a kept
+# character gone from the French page whose font box touches an erased zone (ZAPS) but whose letter itself
+# (baseline up to 0.7 size) does not, and whose loss shows: the original and the French page differ in its letter
+# area, leaving out the pixels of any other letter, English (replaced) or French. Shuffle and Swing has 600 hidden
+# numbers and labels (under a picture, clipped) that vanish with the paragraphs around them: each test alone
+# kept dozens of them, both together only « SHUFFLE ».
+erased = []
+MAT = pymupdf.Matrix(2, 2)
+
+
+def letter_area(c, size):
+    return pymupdf.Rect(c["bbox"][0], c["origin"][1] - 0.7 * size, c["bbox"][2], c["origin"][1])
+
+
+def loss_shows(a, others, pa, pb):
+    """Original (pa) and French (pb) renders differ in the letter area a, outside the other letters."""
+    others = [o * MAT for o in others if o.intersects(a) and abs(o.x0 - a.x0) + abs(o.y1 - a.y1) > 0.2]
+    r = (a * MAT).irect & pa.irect & pb.irect
+    n = tot = 0
+    for yy in range(r.y0, r.y1):
+        for xx in range(r.x0, r.x1):
+            if any(o.contains(pymupdf.Point(xx + 0.5, yy + 0.5)) for o in others):
+                continue
+            tot += 1
+            n += abs(pa.pixel(xx, yy)[0] - pb.pixel(xx, yy)[0]) > 60
+    return n >= max(3, 0.08 * tot)
+
+
+for pno, zaps in sorted(ZAPS.items()):
+    kept = [(bi, li, l) for bi, ls in page_lines(pno).items() for li, l in enumerate(ls)
+            if (pno, bi, li) not in used and ltext(l).strip()]
+    have, letters, pix = {}, [], None
+    for d, keep in ((out[pno], True), (src[pno], False)):
+        for b in d.get_text("rawdict")["blocks"]:
+            for l in b.get("lines", []):
+                for s in l["spans"]:
+                    for c in s["chars"]:
+                        if keep:
+                            r = pymupdf.Rect(c["bbox"])
+                            have.setdefault(c["c"], []).append(((r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2))
+                        if c["c"].strip():
+                            letters.append(letter_area(c, s["size"]))
+    for bi, li, l in kept:
+        lost = []
+        for s in l["spans"]:
+            for c in s["chars"]:
+                if not c["c"].strip():
+                    continue
+                box = pymupdf.Rect(c["bbox"])
+                a = letter_area(c, s["size"])
+                if not any(box.intersects(z) for z in zaps) or any((a + (0.3, 0.3, -0.3, -0.3)).intersects(z)
+                                                                    for z in zaps):
+                    continue
+                x, y = (box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2
+                if any(abs(x - u) < 1.5 and abs(y - v) < 1.5 for u, v in have.get(c["c"], ())):
+                    continue
+                if pix is None:
+                    pix = [d[pno].get_pixmap(matrix=MAT, colorspace=pymupdf.csGRAY) for d in (src, out)]
+                if loss_shows(a, letters, *pix):
+                    lost.append(c["c"])
+        if lost:
+            erased.append(f"  page {pno} b{bi}:{li}  « {ltext(l).strip()[:50]} » : {len(lost)} caractère(s) "
+                          f"disparu(s) ({' '.join(lost[:12])})")
+if erased:
+    log.append(f"TEXTE GARDÉ EFFACÉ ({len(erased)} ligne(s)) — emporté par l'effacement d'une ligne voisine "
+               f"(boîte des lettres bien plus haute que les lettres) : le recoller depuis l'original dans "
+               f"AVANT_TEXTE du spec, page.show_pdf_page(clip, src, pno, clip=clip), clip limité au texte gardé "
+               f"(references/pieges.md) :")
+    log += erased
+else:
+    log.append("Texte gardé effacé par erreur : aucun.")
 left = [str(p.number) for p in out if MARK in p.get_text()]
 log.append(f"MARQUEUR ¤ RESTANT pages {', '.join(left)}" if left else "Marqueurs ¤ restants : aucun.")
 try:

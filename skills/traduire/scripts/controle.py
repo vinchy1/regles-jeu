@@ -40,20 +40,60 @@ def _inter(a, b):
     return _area(pymupdf.Rect(a) & b)
 
 
+class _Dessin:
+    """Ce qu'il y a sous le texte français, d'après les pixels de la page construite dont tout le texte a été retiré
+    (décor seul, icônes déplacées comprises) : fond uni (papier, même texturé, aplat d'encadré) ou dessin (photo,
+    tuile, carte, flèche, icône). Les rectangles d'images ne suffisent pas : bien des livrets ont un fond fait de
+    grandes images (des centaines de fausses alertes, qui noient les vraies), et une légende plus longue que
+    l'anglais ne mord parfois que de quelques points sur l'illustration ou la flèche voisine."""
+    K = 2  # pixels par point
+
+    def __init__(self, page):
+        pix = page.get_pixmap(matrix=pymupdf.Matrix(self.K, self.K), colorspace=pymupdf.csGRAY)
+        self.w, self.h, self.px = pix.width, pix.height, pix.samples
+
+    def _px(self, r):
+        k = self.K
+        return (max(0, int(r.x0 * k)), max(0, int(r.y0 * k)), min(self.w, int(r.x1 * k) + 1), min(self.h, int(r.y1 * k) + 1))
+
+    def sous(self, r, orig_text=()):
+        """Largeur (pt) de dessin sous la ligne r : colonnes de pixels dont un quart au moins s'écarte nettement du
+        fond de la ligne (sa valeur médiane). Les colonnes où l'original avait déjà du texte à cette hauteur ne
+        comptent pas (étiquette posée sur une carte, encadré, fond bois : voulu par l'original) ; seul compte ce que
+        le français ajoute. 0 si moins de 2 pt : bord de cadre effleuré, grain du papier."""
+        x0, y0, x1, y1 = self._px(r)
+        if x1 - x0 < 2 or y1 - y0 < 2:
+            return 0
+        deja = [(o.x0 - 1, o.x1 + 1) for o in orig_text if min(o.y1, r.y1) - max(o.y0, r.y0) > 0.5 * r.height]
+        fond = sorted(self.px[y * self.w + x] for y in range(y0, y1) for x in range(x0, x1))[(x1 - x0) * (y1 - y0) // 2]
+        larg = sum(1 for x in range(x0, x1)
+                   if not any(a <= x / self.K <= b for a, b in deja)
+                   and sum(1 for y in range(y0, y1) if abs(self.px[y * self.w + x] - fond) > 60) >= max(2, (y1 - y0) / 4))
+        larg /= self.K
+        return larg if larg >= 2 else 0
+
+
+def _decor(out_path):
+    """Le PDF construit sans aucun texte (images et tracés gardés), pour _Dessin."""
+    doc = pymupdf.open(out_path)
+    for page in doc:
+        page.add_redact_annot(page.rect, fill=False)
+        page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE, graphics=pymupdf.PDF_REDACT_LINE_ART_NONE,
+                              text=getattr(pymupdf, "PDF_REDACT_TEXT_REMOVE", 0))
+    return doc
+
+
 def check_text(out_path, src_path, names, log):
     """Livret à texte : français qui chevauche une image, un autre texte français, du texte d'origine resté en
     place, ou qui sort de la page."""
-    out, src = pymupdf.open(out_path), pymupdf.open(src_path)
+    out, src, decor = pymupdf.open(out_path), pymupdf.open(src_path), _decor(out_path)
     issues = []
-    for page, orig in zip(out, src):
-        pa = _area(page.rect)
+    for page, orig, nu in zip(out, src, decor):
         spans = _spans(page)
         fr = [s for s in spans if s[1] in names]
         rest = [s for s in spans if s[1] not in names and s[2] != "¤"]
         orig_text = [pymupdf.Rect(s[0]) for s in _spans(orig)]
-        imgs = [pymupdf.Rect(i["bbox"]) for i in page.get_image_info()
-                if _area(pymupdf.Rect(i["bbox"])) < 0.35 * pa
-                and not (i["bbox"][2] - i["bbox"][0] < 22 and i["bbox"][3] - i["bbox"][1] < 16)]
+        dessin = _Dessin(nu)
         seen = set()
 
         def add(r, msg):
@@ -65,11 +105,9 @@ def check_text(out_path, src_path, names, log):
         for i, (r, _, t) in enumerate(fr):
             if not page.rect.contains(r):
                 add(r, f"sort de la page — « {t[:40]} »")
-            for im in imgs:
-                inter = r & im
-                if _area(inter) > 0.3 * _area(r) and not any(_area(o & inter) > 0.3 * _area(inter) for o in orig_text):
-                    add(r, f"chevauche une image — « {t[:40]} »")
-                    break
+            large = dessin.sous(r, orig_text)
+            if large:
+                add(r, f"chevauche un dessin ({large:.0f} pt) — « {t[:40]} »")
             for r2, f2, t2 in rest:
                 if _inter(r, r2) > 0.15 * min(_area(r), _area(r2)):
                     add(r, f"touche du texte d'origine « {t2[:20]} » — « {t[:30]} »")
