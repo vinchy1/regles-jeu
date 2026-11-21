@@ -57,7 +57,7 @@ un livret à problème est mis de côté et signalé.
      dans le doute, demander. Vaut aussi pour un scan recouvert.
 4. **Construire** : `python -X utf8 build.py sortie.pdf`. « ERREUR : » = spec à corriger. Journal : « police
    réduite », « DÉBORDE », icônes, **« TEXTE NON TRADUIT »** (traduire, ou `IGNORE`), **« À VÉRIFIER »**,
-   « drapeau français posé ».
+   **« TEXTE GARDÉ EFFACÉ »** (le recoller : `references/pieges.md`), « drapeau français posé ».
    - **Livret à fond sombre** : une version économe en encre à imprimer est possible **en plus**, jamais
      d'office — seulement si l'utilisateur la demande : `references/encre.md`.
 5. **Relire** — deux agents lancés **en parallèle** (un message, deux appels Agent). Messages **courts** : les

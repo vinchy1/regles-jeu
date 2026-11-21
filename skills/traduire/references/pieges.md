@@ -108,6 +108,25 @@ La plupart sont déjà gérés par `scripts/build.py` ; ce qui reste à faire da
 - **Icône rattachée à la mauvaise ligne** (lignes hautes qui se chevauchent) : le moteur la rattache à la ligne
   dont le milieu est le plus proche ; si une icône sort encore décalée d'une ligne, vérifier `blocks.txt`.
 
+## Texte gardé emporté par l'effacement d'une ligne voisine
+Journal « TEXTE GARDÉ EFFACÉ » : un texte qu'on garde (titre du jeu, lettre A B C sur un pion, nombre) a perdu des
+lettres. Effacer une ligne retire du PDF **toute lettre dont la boîte touche la zone effacée**, et la boîte d'une
+lettre est celle de la police (ascendantes, descendantes), souvent bien plus haute que la lettre elle-même : un
+titre de 74 pt (Shuffle and Swing : « SHUFFLE » sous « RULEBOOK », qui a perdu U F F) ou une lettre en gras sur un
+pion juste sous sa légende (Escape to Cosmo : A, B, C disparus des pions) y passent. Le contrôle compare l'original
+et le français à l'endroit de la lettre : texte caché (sous une image, rogné) ignoré.
+Correction, dans le spec : recoller la zone depuis l'original, **limitée au texte gardé** (sans la ligne traduite
+voisine, sinon l'anglais revient) :
+```python
+def AVANT_TEXTE(page, pno, log):
+    if pno == 0:
+        import pymupdf
+        clip = pymupdf.Rect(120, 61, 465, 142)  # le titre, sous la ligne effacée
+        with pymupdf.open(SRC) as src:
+            page.show_pdf_page(clip, src, 0, clip=clip)
+```
+Reconstruire : l'alerte disparaît quand la lettre est revenue.
+
 ## Drapeau de la langue d'origine
 Beaucoup de livrets affichent la langue par un drapeau (Royaume-Uni, États-Unis, moitié des deux, Japon…), souvent
 dans un rond près du titre ou du nombre de joueurs. Dans la version française, il devient le drapeau français :
