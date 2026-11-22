@@ -53,7 +53,8 @@ post… ») avant de poster.
    sources. Les reprendre, sans relire ce qui est déjà sûr.
 1. **BGG** : `python -I -X utf8 <plugin>/skills/rechercher/scripts/bgg.py chercher "<nom>"` (identifiant connu par `bgg.json` : passer
    directement à la fiche), puis `bgg.py fiche <identifiant>` : titre exact, autres noms (écriture japonaise),
-   année, joueurs, auteurs, illustrateurs, éditeurs, mécaniques, image. Plusieurs jeux du même nom : celui dont
+   année, joueurs, auteurs, illustrateurs, éditeurs, mécaniques, image, formats des cartes (relevés par la
+   communauté, sans clé : `bgg.py cartes <identifiant>` les donne seuls). Plusieurs jeux du même nom : celui dont
    l'éditeur ou l'année correspond aux autres sources ; doute → noté. Absent de BGG : courant pour un jeu du
    dernier Game Market.
 2. **Boutique GM** : `python -I -X utf8 <skill>/scripts/boutique_gm.py chercher "<nom>"`, puis `fiche <lien>` pour
@@ -95,8 +96,13 @@ réponse dans le post), dans cet ordre :
 
   [<Type>]
 
-  Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu)
+  Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu ; plusieurs formats : tous, séparés par `, `)
   ```
+  - Cartes : format du Game Market pour un jeu qui y est (c'est l'édition japonaise décrite), sinon celui de BGG.
+    Plusieurs formats dans la boîte : **tous**, dans l'ordre de BGG, chacun avec son nombre, et son nom traduit
+    quand BGG en donne un : `Cartes : 73 cartes Âge (44 x 68 mm), 13 cartes Merveille (65 x 100 mm)`. Promos et
+    extensions ne comptent pas (une extension a sa propre fiche). « autre(s) édition(s) relevée(s) » : garder la
+    première, sauf si une autre correspond mieux à l'édition du livret (doute → noté). Aucun format : pas de ligne.
   - Noms : romanisation puis original entre parenthèses quand il est connu : `Kentaro Yazawa (矢沢 賢太郎)`,
     `T親方 (Master T)` (forme de BGG gardée telle quelle). Même personne aux deux places : la répéter. Plusieurs
     noms : séparés par `, `. Éditeur : orthographe de BGG.

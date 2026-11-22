@@ -3,6 +3,16 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.7.4] — 2026-11-22
+### Ajouté
+- `bgg.py` : **formats des cartes** relevés par la communauté de BoardGameGeek (page « Sleeves » du jeu), lus par
+  l'adresse JSON de cette page (`api.geekdo.com/api/cardsetsbygame`, sans clé ni Cloudflare). `bgg.py fiche` les
+  ajoute (ligne `Cartes :`), `bgg.py cartes <identifiant>` les donne seuls. Tous les formats de la boîte, avec leur
+  nom quand BGG en a un (`73 cartes (44 x 68 mm : Age Cards), 13 cartes (65 x 100 mm : Wonder Cards)`) ; promos et
+  ajouts écartés ; plusieurs éditions relevées : la première, les autres signalées. Sur 250 jeux d'une ludothèque,
+  la plupart des jeux édités en Occident sont renseignés, peu des jeux récents du Game Market.
+- `fiche-discord` : ligne `Cartes :` remplie par BGG quand le Game Market ne la donne pas, avec tous les formats.
+
 ## [1.7.3] — 2026-11-21
 ### Ajouté
 - `build.py` : contrôle **« TEXTE GARDÉ EFFACÉ »**. Effacer une ligne traduite retire aussi toute lettre gardée

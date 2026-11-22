@@ -82,7 +82,7 @@ Game Market : <lien>                 (seulement pour un jeu japonais)
 
 [<Type>]                             (mécanique principale en anglais : [Trick-Taking], [Ladder Climbing]…)
 
-Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu)
+Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu ; plusieurs formats : tous, séparés par « , »)
 ```
 
 - **Titre du post** : le titre BGG exact (règle du « Guide des posts » du salon) ; sans BGG, celui de la boutique.
@@ -98,10 +98,11 @@ Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu)
 | Titre exact, année, joueurs, auteurs, illustrateurs, éditeurs, mécaniques, image | BoardGameGeek, par l'API (`bgg.py` de la skill `rechercher`) ; identifiant déjà connu par `_outils/bgg.json` de l'app quand il y est |
 | Lien boutique, noms, image de secours | boutique goldenmeeple.be (`scripts/boutique_gm.py`) |
 | Noms japonais, nombre et format des cartes | fiche du Tokyo Game Market (`fiche_gm.py` de la skill `rechercher`) |
+| Format des cartes d'un jeu absent du Game Market (tous les formats de la boîte) | BoardGameGeek, relevés de la communauté (page « Sleeves »), lus sans clé (`bgg.py cartes <identifiant>`) |
 | Vidéo de règles | chaîne YouTube Golden Meeple, vidéos « <Jeu> \| LA REGLE » |
 | Livrets | dossier du jeu dans la ludothèque |
 
-Sources en désaccord : BGG l'emporte, l'écart est noté dans `notes.txt`.
+Sources en désaccord : BGG l'emporte (sauf le format des cartes, où le Game Market décrit l'édition japonaise), l'écart est noté dans `notes.txt`.
 
 ---
 
