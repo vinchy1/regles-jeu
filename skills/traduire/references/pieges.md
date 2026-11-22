@@ -116,16 +116,28 @@ titre de 74 pt (Shuffle and Swing : « SHUFFLE » sous « RULEBOOK », qui a per
 pion juste sous sa légende (Escape to Cosmo : A, B, C disparus des pions) y passent. Le contrôle compare l'original
 et le français à l'endroit de la lettre : texte caché (sous une image, rogné) ignoré.
 Correction, dans le spec : recoller la zone depuis l'original, **limitée au texte gardé** (sans la ligne traduite
-voisine, sinon l'anglais revient) :
+voisine, sinon l'anglais revient), **en image** : `page.show_pdf_page(clip, src, pno, clip=clip)` marche mais recopie
+les images de la page d'origine (Escape to Cosmo : 8,4 → 10,9 Mo pour 4 lettres), et une image collée telle quelle
+peut avoir une teinte un peu différente du fond construit (carré visible). Lettre claire sur fond uni : ne garder
+que la lettre, en transparence (Escape to Cosmo) :
 ```python
 def AVANT_TEXTE(page, pno, log):
-    if pno == 0:
+    if pno in ZONES_GARDEES:  # {page: [(x0, y0, x1, y1)]}, cadre serré autour de chaque lettre
         import pymupdf
-        clip = pymupdf.Rect(120, 61, 465, 142)  # le titre, sous la ligne effacée
         with pymupdf.open(SRC) as src:
-            page.show_pdf_page(clip, src, 0, clip=clip)
+            for r in ZONES_GARDEES[pno]:
+                pix = src[pno].get_pixmap(dpi=600, clip=pymupdf.Rect(r), colorspace=pymupdf.csGRAY)
+                fond = sorted(pix.samples)[len(pix.samples) // 10]  # couleur du fond (10 % les plus sombres)
+                alpha = bytes(max(0, min(255, (v - fond) * 255 // max(1, 255 - fond))) for v in pix.samples)
+                img = pymupdf.Pixmap(pymupdf.csRGB, pix.w, pix.h, bytes([255]) * (3 * pix.w * pix.h), False)
+                img = pymupdf.Pixmap(img, 1)
+                img.set_alpha(alpha)
+                page.insert_image(pymupdf.Rect(r), pixmap=img)
 ```
-Reconstruire : l'alerte disparaît quand la lettre est revenue.
+(lettre blanche ; pour une lettre foncée sur fond clair, inverser le calcul de `alpha` et la couleur). Titre sur une
+illustration (Shuffle and Swing) : image entière du cadre, `get_pixmap(dpi=600, clip=…)` puis `insert_image`.
+Reconstruire : l'alerte disparaît quand la lettre est revenue (une image n'a pas de texte : le contrôle compare alors
+l'original et le français à l'endroit de la lettre, qui ne diffèrent plus).
 
 ## Drapeau de la langue d'origine
 Beaucoup de livrets affichent la langue par un drapeau (Royaume-Uni, États-Unis, moitié des deux, Japon…), souvent

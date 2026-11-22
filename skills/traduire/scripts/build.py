@@ -964,7 +964,7 @@ def loss_shows(a, others, pa, pb):
                 continue
             tot += 1
             n += abs(pa.pixel(xx, yy)[0] - pb.pixel(xx, yy)[0]) > 60
-    return n >= max(3, 0.08 * tot)
+    return n >= max(3, 0.2 * tot)  # a lost letter changes 30-60 % of its area; a pasted image only its edges (~10 %)
 
 
 for pno, zaps in sorted(ZAPS.items()):
@@ -1005,8 +1005,7 @@ for pno, zaps in sorted(ZAPS.items()):
 if erased:
     log.append(f"TEXTE GARDÉ EFFACÉ ({len(erased)} ligne(s)) — emporté par l'effacement d'une ligne voisine "
                f"(boîte des lettres bien plus haute que les lettres) : le recoller depuis l'original dans "
-               f"AVANT_TEXTE du spec, page.show_pdf_page(clip, src, pno, clip=clip), clip limité au texte gardé "
-               f"(references/pieges.md) :")
+               f"AVANT_TEXTE du spec, en image limitée au texte gardé (references/pieges.md) :")
     log += erased
 else:
     log.append("Texte gardé effacé par erreur : aucun.")
