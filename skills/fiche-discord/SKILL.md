@@ -43,8 +43,10 @@ Les fiches doivent ressembler à celles déjà postées dans le salon (même ord
 ## Méthode
 
 ### 1. Doublons : vérifiés par l'utilisateur
-Pas de vérification dans Discord. Une fiche déjà publiée par webhook (`_outils/<Jeu>/fiche/envoye.txt`) : le dire et ne pas la
-refaire, sauf demande. Au bilan, rappeler de chercher le titre dans le salon (« Recherche ou création d'un
+Pas de vérification dans Discord. Un jeu qui a déjà son post (`_outils/<Jeu>/fiche/envoye.txt`, avec son `lien` : écrit
+par `webhook.py` après un envoi, ou par l'app Règles de jeu quand l'utilisateur colle le lien d'un post fait à la main
+ou par un autre membre, `"a_la_main": true`) : le dire avec le lien et ne pas faire la fiche, sauf demande — même
+s'il n'a pas de fiche préparée (`envoye.txt` seul). Au bilan, rappeler de chercher le titre dans le salon (« Recherche ou création d'un
 post… ») avant de poster.
 
 ### 2. Recherches (indépendantes : lancées ensemble, pour tous les jeux)
@@ -119,7 +121,7 @@ réponse dans le post), dans cet ordre :
   Noms du livret complet (l'app et `webhook.py` prennent d'eux-mêmes sa version `_light.pdf` au-delà de 10 Mo) ;
   un livret qui manque n'y figure pas ; ce sont des noms de fichiers du dossier du jeu `<Ludothèque>/<Jeu>/`. La
   couverture n'y figure pas : elle est trouvée dans `fiche/`.
-Fiche déjà là (« refaire ») : la remplacer, mais garder `envoye.txt` (trace d'un envoi par webhook).
+Fiche déjà là (« refaire ») : la remplacer, mais garder `envoye.txt` (lien du post déjà publié).
 
 ### 5. Bilan
 Un tableau : jeu, titre, ce qui manque, réserves, chemin complet du dossier `fiche/`. Puis rappeler comment

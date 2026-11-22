@@ -3,6 +3,12 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.7.5] — 2026-11-22
+### Ajouté
+- `fiche-discord` : un jeu déjà posté à la main, ou par un autre membre, peut être noté (lien du post collé dans
+  l'app Règles de jeu, gardé dans `fiche/envoye.txt` avec `"a_la_main": true`, comme après un envoi par webhook) ;
+  la skill le respecte même sans fiche préparée : elle donne le lien au lieu de refaire une fiche.
+
 ## [1.7.4] — 2026-11-22
 ### Ajouté
 - `bgg.py` : **formats des cartes** relevés par la communauté de BoardGameGeek (page « Sleeves » du jeu), lus par
