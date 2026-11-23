@@ -1,20 +1,34 @@
 # -*- coding: utf-8 -*-
-"""Version allégée d'un livret traduit, pour l'envoyer sur Discord (10 Mo maximum).
+"""Version allégée d'un livret traduit, pour l'envoyer sur Discord (10 Mo maximum par fichier).
 
 Usage : python -X utf8 comprimer.py "<livret.pdf>" [--max 10] [--sortie "<fichier.pdf>"] [--remplacer]
 Écrit `<nom>_light.pdf` À CÔTÉ du livret : le livret en pleine qualité n'est jamais touché ni remplacé, la
 version allégée est un fichier de plus, à n'envoyer que sur Discord.
-Seules les images sont recompressées en JPEG, et ramenées à un dpi plus bas si elles sont très fines ; le texte
-reste du texte (vectoriel), donc net à l'écran comme à l'impression. Le script s'arrête au premier essai qui
-passe sous la limite, pour abîmer les images le moins possible, et vérifie que le texte n'a pas bougé.
+
+1. Les dessins vectoriels répétés à l'identique (fond copié sur chaque page, qui ne diffère que par sa position)
+   sont ramenés à un seul dessin partagé : rendu identique, souvent plusieurs Mo de gagnés.
+2. Les images sont recompressées en JPEG, et ramenées à un dpi plus bas si elles sont très fines, en s'arrêtant
+   au premier essai qui passe sous la limite. Jamais en dessous d'un plancher (150 dpi, qualité 70) : plus bas,
+   les images deviennent illisibles.
+3. Si aucun essai lisible ne passe, le livret est coupé en parties de pages consécutives
+   (`<nom>_light_partie1.pdf`, `…_partie2.pdf`…), chacune sous la limite et compressée le moins possible.
+Le texte reste du texte (vectoriel), net à l'écran comme à l'impression ; le script vérifie qu'il n'a pas bougé.
 Livret déjà sous la limite : il le dit et ne fait rien."""
-import os, re, sys
+import glob, hashlib, os, re, sys
 import pymupdf
 
 LIMITE = 10e6  # 10 Mo : taille maximale d'un envoi Discord (lecture la plus stricte du Mo)
 MARGE = 0.98   # viser un peu en dessous plutôt que de jouer avec la limite
-# essais successifs (dpi visé, qualité JPEG), du plus fin au plus serré ; None = nettoyage seul, images intactes
-PASSES = [(None, None), (300, 92), (300, 85), (220, 80), (170, 72), (140, 65), (110, 55), (85, 45), (72, 35)]
+# essais successifs (dpi visé, qualité JPEG), du plus fin au plus serré ; None = nettoyage seul, images intactes.
+# Le dernier est le plancher : plus bas, les images d'un livret ne se lisent plus (Uncharted Passage, 11/2026 :
+# illustrations et icônes en bouillie dans une version poussée jusqu'à 72 dpi). Plutôt couper en parties.
+PASSES = [(None, None), (300, 92), (300, 85), (220, 80), (170, 72), (150, 70)]
+PLANCHER = "150 dpi, qualité 70"
+BONNES = 4  # les 4 premiers essais (jusqu'à 220 dpi, qualité 80) gardent les images nettes : couper le livret en
+            # parties qui passent ainsi vaut mieux qu'un seul fichier aux images abîmées ; le plancher ne sert
+            # que si aucun découpage ne passe avec eux
+MAX_PARTIES = 10    # Discord : 10 pièces jointes au plus par message
+DESSIN_MIN = 10_000  # octets : un dessin plus petit ne vaut pas la peine d'être partagé
 OPTIONS = {"--max", "--sortie"}  # options suivies d'une valeur
 
 
@@ -104,9 +118,53 @@ def accorder_couleurs(doc, corriger=True):
     return n
 
 
-def essai(src, dst, dpi, qual):
-    """Une passe de compression ; rend la taille obtenue."""
+def partager_dessins(doc):
+    """Motifs (PatternType 1) et formes (XObject Form) au dessin identique octet pour octet, mêmes ressources et
+    même cadre, mais à une position (/Matrix) différente : garbage=4 ne peut pas les fusionner et chaque copie pèse
+    son poids (Uncharted Passage : 25 copies de fonds de 350 à 400 Ko, 9,5 Mo sur 27). Le dessin passe dans une
+    seule forme partagée ; chaque copie garde sa position et son cadre et ne fait plus qu'appeler cette forme.
+    Rendu identique. Rend le nombre de copies remplacées."""
+    groupes = {}
+    for x in range(1, doc.xref_length()):
+        try:
+            if not doc.xref_is_stream(x):
+                continue
+            if doc.xref_get_key(x, "PatternType")[1] != "1" and doc.xref_get_key(x, "Subtype")[1] != "/Form":
+                continue
+            raw = doc.xref_stream_raw(x) or b""
+        except Exception:
+            continue
+        if len(raw) < DESSIN_MIN:
+            continue
+        cle = (hashlib.sha1(raw).hexdigest(), doc.xref_get_key(x, "Resources"), doc.xref_get_key(x, "BBox")[1],
+               doc.xref_get_key(x, "Filter")[1], doc.xref_get_key(x, "DecodeParms")[1])
+        groupes.setdefault(cle, []).append(x)
+    n = 0
+    for (_, res, bbox, _, _), xs in groupes.items():
+        if len(xs) < 2 or not bbox.startswith("["):
+            continue
+        try:
+            dessin = doc.xref_stream(xs[0])
+        except Exception:
+            continue
+        ressources = res[1] if res[0] in ("dict", "xref") else "<<>>"
+        forme = doc.get_new_xref()
+        doc.update_object(forme, f"<</Type/XObject/Subtype/Form/BBox{bbox}/Resources {ressources}>>")
+        doc.update_stream(forme, dessin)
+        for x in xs:
+            doc.xref_set_key(x, "Resources", f"<</XObject<</FmPartage {forme} 0 R>>>>")
+            doc.xref_set_key(x, "DecodeParms", "null")
+            doc.update_stream(x, b"/FmPartage Do")
+            n += 1
+    return n
+
+
+def essai(src, dst, dpi, qual, pages=None):
+    """Une passe de compression, sur tout le livret ou une suite de pages ; rend la taille obtenue."""
     doc = pymupdf.open(src)
+    if pages is not None:
+        doc.select(list(pages))
+    partager_dessins(doc)
     if dpi:  # images plus fines que dpi ramenées à dpi et recompressées (le trait pur est laissé tranquille)
         doc.rewrite_images(dpi_threshold=dpi + 1, dpi_target=dpi, quality=qual, bitonal=False)
         accorder_couleurs(doc)
@@ -117,6 +175,33 @@ def essai(src, dst, dpi, qual):
     doc.save(dst, garbage=4, deflate=True, deflate_images=True, deflate_fonts=True, clean=True)
     doc.close()
     return os.path.getsize(dst)
+
+
+def comprimer(src, tmp, cible, pages=None, passes=PASSES):
+    """Passes du plus doux au plus serré, arrêtées à la première sous la cible. Rend (taille, essai retenu) ;
+    essai None si même la dernière dépasse (tmp est alors la version la plus serrée)."""
+    for dpi, qual in passes:
+        n = essai(src, tmp, dpi, qual, pages)
+        if n <= cible:
+            return n, ("nettoyage seul, images intactes" if not dpi else
+                       f"images en JPEG qualité {qual}, au plus {dpi} dpi")
+    return n, None
+
+
+def decouper(nb_pages, k):
+    """k suites de pages consécutives, aussi égales que possible."""
+    bornes = [round(i * nb_pages / k) for i in range(k + 1)]
+    return [range(bornes[i], bornes[i + 1]) for i in range(k)]
+
+
+def verifier(tmp, ref):
+    if texte(tmp) != ref:
+        fail("le texte du livret a changé pendant la compression — version allégée abandonnée")
+    verif = pymupdf.open(tmp)
+    faux = accorder_couleurs(verif, corriger=False)
+    verif.close()
+    if faux:
+        fail(f"{faux} image(s) aux couleurs incohérentes (illisibles dans Acrobat) — version allégée abandonnée")
 
 
 def main():
@@ -134,40 +219,56 @@ def main():
     dst = os.path.abspath(opt("--sortie") or os.path.splitext(src)[0] + "_light.pdf")
     if os.path.normcase(dst) == os.path.normcase(src):
         fail("la sortie remplacerait le livret d'origine — donner un autre nom avec --sortie")
-    if os.path.exists(dst) and "--remplacer" not in sys.argv:
-        fail(f"{dst} existe déjà — relancer avec --remplacer pour l'écraser")
+    racine = os.path.splitext(dst)[0]
+    anciens = ([dst] if os.path.exists(dst) else []) + sorted(glob.glob(glob.escape(racine) + "_partie*.pdf"))
+    if anciens and "--remplacer" not in sys.argv:
+        fail(f"{anciens[0]} existe déjà — relancer avec --remplacer pour l'écraser")
 
     ref = texte(src)
-    tmp = dst + ".essai"
     cible = limite * MARGE
-    print(f"{os.path.basename(src)} : {taille(n0)} à ramener sous {limite / 1e6:.0f} Mo")
-    n, comment = n0, ""
+    kmax = max(1, min(MAX_PARTIES, len(ref)))
+    print(f"{os.path.basename(src)} : {taille(n0)} à ramener sous {limite / 1e6:.0f} Mo par fichier")
+    faits = []  # (fichier d'essai, fichier final, taille, essai retenu ou None, pages ou None)
     try:
-        for dpi, qual in PASSES:
-            n = essai(src, tmp, dpi, qual)
-            comment = ("nettoyage seul, images intactes" if not dpi else
-                       f"images en JPEG qualité {qual}, au plus {dpi} dpi")
-            print(f"  {comment} : {taille(n)}")
-            if n <= cible:
+        essais = [(k, PASSES[:BONNES]) for k in range(1, kmax + 1)] + [(k, PASSES) for k in range(1, kmax + 1)]
+        for j, (k, passes) in enumerate(essais):
+            dernier = j == len(essais) - 1
+            for f in faits:
+                os.remove(f[0])
+            faits = []
+            for i, pages in enumerate(decouper(len(ref), k) if k > 1 else [None], 1):
+                final = dst if k == 1 else f"{racine}_partie{i}.pdf"
+                n, comment = comprimer(src, final + ".essai", cible, pages, passes)
+                faits.append((final + ".essai", final, n, comment, pages))
+                if not comment and not dernier:
+                    break  # cette partie ne passe pas : essayer en plus de parties
+            if all(f[3] for f in faits):
                 break
-        if texte(tmp) != ref:
-            fail("le texte du livret a changé pendant la compression — version allégée abandonnée")
-        verif = pymupdf.open(tmp)
-        faux = accorder_couleurs(verif, corriger=False)
-        verif.close()
-        if faux:
-            fail(f"{faux} image(s) aux couleurs incohérentes (illisibles dans Acrobat) — version allégée abandonnée")
-        if os.path.exists(dst):
-            os.remove(dst)
-        os.replace(tmp, dst)
+            if passes is PASSES or k == kmax:
+                print(f"  en {k} fichier{'s' * (k > 1)} : trop lourd "
+                      + (f"même au plancher lisible ({PLANCHER})" if passes is PASSES else
+                         "sans abîmer les images, quel que soit le découpage — essais jusqu'au plancher"))
+        for tmp, final, n, comment, pages in faits:
+            verifier(tmp, [ref[p] for p in pages] if pages is not None else ref)
+        for vieux in anciens:  # ancienne version allégée (un fichier ou des parties) : remplacée en entier
+            os.remove(vieux)
+        for tmp, final, *_ in faits:
+            os.replace(tmp, final)
     finally:
-        if os.path.exists(tmp):
-            os.remove(tmp)
-    print(f"version allégée -> {dst}  ({taille(n0)} -> {taille(n)}, {comment})")
-    print(f"le livret en pleine qualité reste {os.path.basename(src)}, inchangé")
-    if n > limite:
-        print(f"ATTENTION : {taille(n)} reste au-dessus de {limite / 1e6:.0f} Mo — livret très riche en images. "
-              f"L'envoyer en deux fichiers (le couper en deux moitiés de pages) est le plus simple.")
+        for f in faits:
+            if os.path.exists(f[0]):
+                os.remove(f[0])
+    if len(faits) > 1:
+        print(f"livret coupé en {len(faits)} parties de moins de {limite / 1e6:.0f} Mo (en un seul fichier, il aurait fallu "
+              f"abîmer les images) — à poster en messages séparés :")
+    for tmp, final, n, comment, pages in faits:
+        quoi = f"pages {pages.start + 1} à {pages.stop}, " if pages is not None else ""
+        print(f"version allégée -> {final}  ({quoi}{taille(n)}, {comment or 'plancher : ' + PLANCHER})")
+    print(f"le livret en pleine qualité reste {os.path.basename(src)} ({taille(n0)}), inchangé")
+    trop = [f for f in faits if f[2] > limite]
+    if trop:
+        print(f"ATTENTION : {len(trop)} fichier(s) restent au-dessus de {limite / 1e6:.0f} Mo, même coupés en "
+              f"{len(faits)} — mettre plutôt le lien du livret dans le message.")
 
 
 if __name__ == "__main__":

@@ -284,9 +284,12 @@ livraison, un livret qui atteint 10 Mo est signalé ; la skill **propose** alors
 la faire d'office. Sous 10 Mo, rien n'est signalé.
 
 `comprimer.py` écrit `<nom>_FR_light.pdf` à côté du livret. **Le livret en pleine qualité n'est ni touché ni
-remplacé** : la version allégée est un fichier de plus, à n'envoyer que sur Discord. Les essais vont du plus
-doux au plus serré et s'arrêtent au premier qui passe sous la limite : nettoyage seul, puis images recompressées
-en JPEG (qualité 92, 85, 80…), puis résolution des images très fines ramenée à 300, 220, 170 dpi…
+remplacé** : la version allégée est un fichier de plus, à n'envoyer que sur Discord. Les dessins répétés à
+l'identique (fond vectoriel copié sur chaque page) sont d'abord partagés, sans changer le rendu. Les essais vont
+ensuite du plus doux au plus serré et s'arrêtent au premier qui passe sous la limite : nettoyage seul, puis images
+recompressées en JPEG (qualité 92, 85, 80), résolution des images très fines ramenée à 300, 220 dpi. Si ça ne
+suffit pas, le livret est **coupé en parties** (`_light_partie1.pdf`, `_light_partie2.pdf`…) plutôt que d'abîmer
+les images, et jamais rien en dessous de 150 dpi qualité 70.
 
 Le **texte reste du texte** : vectoriel, il n'est jamais touché et reste net à l'écran comme à l'impression. Le
 script le vérifie page par page après coup. Détails : `references/alleger.md`.

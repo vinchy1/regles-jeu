@@ -3,6 +3,19 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.7.2] — 2026-11-23
+### Corrigé
+- `comprimer.py` (version allégée pour Discord) n'abîme plus les images d'un livret trop lourd : Uncharted Passage
+  (27 Mo) avait fini en deux fichiers de 6 Mo aux images illisibles (compressé jusqu'à 72 dpi, puis coupé en deux à
+  la main). Désormais :
+  - les dessins vectoriels répétés à l'identique (fond copié sur chaque page, placé ailleurs) sont partagés, rendu
+    identique (Uncharted Passage : 27 → 16,5 Mo sans rien toucher) ;
+  - si les essais doux (jusqu'à 220 dpi, qualité 80) ne suffisent pas, le livret est **coupé en parties**
+    `<nom>_light_partie1.pdf`, `…_partie2.pdf`… (jusqu'à 10), chacune sous 10 Mo et compressée le moins possible
+    (Uncharted Passage : 9,6 + 8,5 Mo, images intactes) ;
+  - plancher à 150 dpi, qualité 70 : plus d'essai à 140, 110, 85 ou 72 dpi.
+- `webhook.py` (fiche-discord) joint les parties `_light_partieN.pdf` d'un livret trop lourd, dans l'ordre.
+
 ## [1.7.1] — 2026-11-11
 ### Corrigé
 - `rechercher` : BoardGameGeek n'est plus ouvert dans le navigateur piloté (bloqué par la vérification anti-robots de

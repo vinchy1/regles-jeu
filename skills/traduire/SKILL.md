@@ -79,7 +79,9 @@ un livret à problème est mis de côté et signalé.
    --pdf <fr.pdf> [--pdf-en <en.pdf>] [--pdf-encre <encre.pdf>] --type "<type>"`.
    Termes généraux nouveaux → `references/glossaire.md`. Résumer : fichiers, vocabulaire, compromis.
    - **Livret d'au moins 10 Mo** (`livrer.py` le signale) : proposer une version allégée pour Discord, jamais
-     la faire d'office — `references/alleger.md` ; le livret en pleine qualité est gardé tel quel. La proposer
+     la faire d'office — `references/alleger.md` ; le livret en pleine qualité est gardé tel quel. Toujours par
+     `comprimer.py`, qui coupe lui-même en parties (`_light_partie1.pdf`…) plutôt que d'abîmer les images : ne
+     jamais compresser au plus serré puis couper soi-même. La proposer
      par une **vraie question** (AskUserQuestion : « Faire une version allégée pour Discord ? », Oui / Non) avant
      le bilan, pas par une phrase glissée dans le bilan, qui passe inaperçue.
 

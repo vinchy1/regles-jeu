@@ -9,7 +9,7 @@ fiche.json) ; les livrets restent dans le dossier du jeu, <Ludothèque>/<Jeu>/. 
 fichier ~/.claude/regles-jeu/discord-webhook.txt (hors de la ludothèque, qui est synchronisée). Elle n'est jamais
 affichée : c'est un secret. Après un envoi, fiche/envoye.txt garde le lien du post (empêche un second envoi).
 """
-import json, mimetypes, os, re, sys, urllib.error, urllib.request, uuid
+import glob, json, mimetypes, os, re, sys, urllib.error, urllib.request, uuid
 from pathlib import Path
 
 MAX_MESSAGE = 2000          # caractères par message Discord
@@ -69,10 +69,14 @@ def pieces(jeu, fiche, problemes):
     out = sorted(f for f in fiche.glob("couverture.*") if f.is_file())[:1]
     for nom in dict.fromkeys(noms):
         f = jeu / os.path.basename(str(nom))
-        leger = f.with_name(f.stem + "_light.pdf")  # trop lourd pour Discord : sa version allégée, si elle existe
-        if f.is_file() and f.stat().st_size > MAX_OCTETS and leger.is_file():
-            f = leger
-        if f.is_file():
+        # trop lourd pour Discord : sa version allégée, si elle existe, en un fichier ou en parties (comprimer.py)
+        leger = f.with_name(f.stem + "_light.pdf")
+        parties = sorted((p for p in f.parent.glob(glob.escape(f.stem) + "_light_partie*.pdf")
+                          if re.search(r"_light_partie\d+\.pdf$", p.name)),
+                         key=lambda p: int(re.search(r"(\d+)\.pdf$", p.name).group(1)))
+        if f.is_file() and f.stat().st_size > MAX_OCTETS and (leger.is_file() or parties):
+            out.extend([leger] if leger.is_file() else parties)
+        elif f.is_file():
             out.append(f)
         else:
             problemes.append(f"livret absent du dossier du jeu : {nom}")

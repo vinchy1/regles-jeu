@@ -72,8 +72,9 @@ réponse dans le post), dans cet ordre :
 2. le livret **français** (`…_FR.pdf`, ou une règle française officielle).
 - Jamais `…_encre.pdf` ni `…_aide-memoire.pdf`, sauf demande.
 - **10 Mo au plus par fichier** (Discord, sans boost) : un livret plus lourd est remplacé par sa version allégée
-  `…_light.pdf` ; absente, la faire (`python -X utf8 <comprimer.py> "<livret.pdf>"` : copie à côté, le livret
-  reste intact) et le noter.
+  `…_light.pdf`, ou ses parties `…_light_partie1.pdf`, `…_partie2.pdf`… (une par message) ; absente, la faire
+  (`python -X utf8 <comprimer.py> "<livret.pdf>"` : copie à côté, le livret reste intact ; le script coupe
+  lui-même en parties s'il le faut, ne jamais couper à la main) et le noter.
 - Aucun livret dans le dossier : skill **regles-jeu:rechercher** pour ce jeu, livret enregistré dans le dossier du
   jeu (pas dans `A traduire/`). Pas de livret français : ne pas traduire d'office ; le noter et le dire au bilan
   (l'app propose de l'envoyer à traduire). Traduire seulement si l'utilisateur l'a demandé (skill
@@ -110,7 +111,8 @@ réponse dans le post), dans cet ordre :
   ```json
   {"livrets": ["<livret anglais (ou VO)>.pdf", "<livret français>.pdf"], "salon": "<lien du salon>", "maj": "<AAAA-MM-JJ>"}
   ```
-  Noms du livret complet (l'app et `webhook.py` prennent d'eux-mêmes sa version `_light.pdf` au-delà de 10 Mo) ;
+  Noms du livret complet (l'app et `webhook.py` prennent d'eux-mêmes sa version `_light.pdf` — `webhook.py` aussi ses parties
+  `_light_partieN.pdf` — au-delà de 10 Mo) ;
   un livret qui manque n'y figure pas ; ce sont des noms de fichiers du dossier du jeu `<Ludothèque>/<Jeu>/`. La
   couverture n'y figure pas : elle est trouvée dans `fiche/`.
 Fiche déjà là (« refaire ») : la remplacer, mais garder `envoye.txt` (trace d'un envoi par webhook).
