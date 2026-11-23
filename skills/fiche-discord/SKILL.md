@@ -43,8 +43,10 @@ Les fiches doivent ressembler à celles déjà postées dans le salon (même ord
 ## Méthode
 
 ### 1. Doublons : vérifiés par l'utilisateur
-Pas de vérification dans Discord. Une fiche déjà publiée par webhook (`_outils/<Jeu>/fiche/envoye.txt`) : le dire et ne pas la
-refaire, sauf demande. Au bilan, rappeler de chercher le titre dans le salon (« Recherche ou création d'un
+Pas de vérification dans Discord. Un jeu qui a déjà son post (`_outils/<Jeu>/fiche/envoye.txt`, avec son `lien` : écrit
+par `webhook.py` après un envoi, ou par l'app Règles de jeu quand l'utilisateur colle le lien d'un post fait à la main
+ou par un autre membre, `"a_la_main": true`) : le dire avec le lien et ne pas faire la fiche, sauf demande — même
+s'il n'a pas de fiche préparée (`envoye.txt` seul). Au bilan, rappeler de chercher le titre dans le salon (« Recherche ou création d'un
 post… ») avant de poster.
 
 ### 2. Recherches (indépendantes : lancées ensemble, pour tous les jeux)
@@ -53,7 +55,8 @@ post… ») avant de poster.
    sources. Les reprendre, sans relire ce qui est déjà sûr.
 1. **BGG** : `python -I -X utf8 <plugin>/skills/rechercher/scripts/bgg.py chercher "<nom>"` (identifiant connu par `bgg.json` : passer
    directement à la fiche), puis `bgg.py fiche <identifiant>` : titre exact, autres noms (écriture japonaise),
-   année, joueurs, auteurs, illustrateurs, éditeurs, mécaniques, image. Plusieurs jeux du même nom : celui dont
+   année, joueurs, auteurs, illustrateurs, éditeurs, mécaniques, image, formats des cartes (relevés par la
+   communauté, sans clé : `bgg.py cartes <identifiant>` les donne seuls). Plusieurs jeux du même nom : celui dont
    l'éditeur ou l'année correspond aux autres sources ; doute → noté. Absent de BGG : courant pour un jeu du
    dernier Game Market.
 2. **Boutique GM** : `python -I -X utf8 <skill>/scripts/boutique_gm.py chercher "<nom>"`, puis `fiche <lien>` pour
@@ -96,8 +99,13 @@ réponse dans le post), dans cet ordre :
 
   [<Type>]
 
-  Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu)
+  Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu ; plusieurs formats : tous, séparés par `, `)
   ```
+  - Cartes : format du Game Market pour un jeu qui y est (c'est l'édition japonaise décrite), sinon celui de BGG.
+    Plusieurs formats dans la boîte : **tous**, dans l'ordre de BGG, chacun avec son nombre, et son nom traduit
+    quand BGG en donne un : `Cartes : 73 cartes Âge (44 x 68 mm), 13 cartes Merveille (65 x 100 mm)`. Promos et
+    extensions ne comptent pas (une extension a sa propre fiche). « autre(s) édition(s) relevée(s) » : garder la
+    première, sauf si une autre correspond mieux à l'édition du livret (doute → noté). Aucun format : pas de ligne.
   - Noms : romanisation puis original entre parenthèses quand il est connu : `Kentaro Yazawa (矢沢 賢太郎)`,
     `T親方 (Master T)` (forme de BGG gardée telle quelle). Même personne aux deux places : la répéter. Plusieurs
     noms : séparés par `, `. Éditeur : orthographe de BGG.
@@ -115,7 +123,7 @@ réponse dans le post), dans cet ordre :
   `_light_partieN.pdf` — au-delà de 10 Mo) ;
   un livret qui manque n'y figure pas ; ce sont des noms de fichiers du dossier du jeu `<Ludothèque>/<Jeu>/`. La
   couverture n'y figure pas : elle est trouvée dans `fiche/`.
-Fiche déjà là (« refaire ») : la remplacer, mais garder `envoye.txt` (trace d'un envoi par webhook).
+Fiche déjà là (« refaire ») : la remplacer, mais garder `envoye.txt` (lien du post déjà publié).
 
 ### 5. Bilan
 Un tableau : jeu, titre, ce qui manque, réserves, chemin complet du dossier `fiche/`. Puis rappeler comment

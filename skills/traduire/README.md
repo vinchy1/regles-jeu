@@ -207,7 +207,8 @@ valeur" » (voir [plus bas](#corriger-une-traduction-déjà-faite)).
    bandeau de titre trop court, remplacer un drapeau), le spec peut fournir une fonction `AVANT_TEXTE`, appelée
    entre l'effacement de l'original et la pose du français.
 4. **Construire** (`build.py`) : efface le texte d'origine, pose le français et les icônes, et écrit un journal :
-   police réduite, débordement, icône non replacée, **texte non traduit**, **à vérifier** (voir plus bas).
+   police réduite, débordement, icône non replacée, **texte non traduit**, **texte gardé effacé**, **à vérifier**
+   (voir plus bas).
 5. **Relire** : texte et mise en page, par deux agents relecteurs ; Claude vérifie chaque point signalé avant de
    corriger, reconstruit, et ne regarde que les pages modifiées.
 6. **Livrer** (`livrer.py`) : Claude écrit `NOTES.md`, puis le script déplace l'original dans `<Jeu>/`, met à
@@ -313,6 +314,9 @@ l'en empêche. Fond blanc, à imprimer. Le contenu est rangé dans `_outils/<Jeu
 ## Contrôles automatiques et relecture
 **Pendant la construction** (`build.py`, `scan.py`, `controle.py`) :
 - **TEXTE NON TRADUIT** : toute ligne d'origine ni remplacée ni volontairement ignorée (`IGNORE`) est listée.
+- **TEXTE GARDÉ EFFACÉ** : texte gardé tel quel (titre du jeu, lettre sur un pion) emporté par l'effacement
+  d'une ligne voisine traduite : le PDF efface toute lettre dont la boîte touche la zone, et une grande police a
+  des boîtes bien plus hautes que ses lettres. Seules les lettres dont la disparition se voit sont signalées.
 - **À VÉRIFIER** : français qui chevauche une image, un autre texte ou un reste de texte d'origine, ou qui sort
   de la page ; sur un scan, ligne d'origine qui dépasse d'un masque.
 - **DÉBORDE / police réduite** : le français ne tient pas à la taille d'origine.

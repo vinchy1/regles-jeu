@@ -82,7 +82,7 @@ Game Market : <lien>                 (seulement pour un jeu japonais)
 
 [<Type>]                             (mécanique principale en anglais : [Trick-Taking], [Ladder Climbing]…)
 
-Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu)
+Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu ; plusieurs formats : tous, séparés par « , »)
 ```
 
 - **Titre du post** : le titre BGG exact (règle du « Guide des posts » du salon) ; sans BGG, celui de la boutique.
@@ -98,10 +98,11 @@ Cartes : <nombre> cartes (<l> x <h> mm)   (seulement si connu)
 | Titre exact, année, joueurs, auteurs, illustrateurs, éditeurs, mécaniques, image | BoardGameGeek, par l'API (`bgg.py` de la skill `rechercher`) ; identifiant déjà connu par `_outils/bgg.json` de l'app quand il y est |
 | Lien boutique, noms, image de secours | boutique goldenmeeple.be (`scripts/boutique_gm.py`) |
 | Noms japonais, nombre et format des cartes | fiche du Tokyo Game Market (`fiche_gm.py` de la skill `rechercher`) |
+| Format des cartes d'un jeu absent du Game Market (tous les formats de la boîte) | BoardGameGeek, relevés de la communauté (page « Sleeves »), lus sans clé (`bgg.py cartes <identifiant>`) |
 | Vidéo de règles | chaîne YouTube Golden Meeple, vidéos « <Jeu> \| LA REGLE » |
 | Livrets | dossier du jeu dans la ludothèque |
 
-Sources en désaccord : BGG l'emporte, l'écart est noté dans `notes.txt`.
+Sources en désaccord : BGG l'emporte (sauf le format des cartes, où le Game Market décrit l'édition japonaise), l'écart est noté dans `notes.txt`.
 
 ---
 
@@ -138,6 +139,9 @@ l'app ou la skill.
 2. « Nouveau post » → coller `titre.txt` dans **Titre**, `message.txt` dans le message, joindre la couverture et
    les livrets, **tout dans ce même message**.
 3. Une fois le post créé, l'épingler (il contient les règles : Guide des posts).
+4. Dans l'app, coller le lien du post (clic droit sur le post → « Copier le lien ») sous la fiche : il est retenu
+   dans `fiche/envoye.txt`, et le jeu n'est plus proposé. Un jeu déjà posté par quelqu'un d'autre se note de même,
+   sans fiche.
 
 Dans l'app Règles de jeu, la section **Fiche Discord** de la fiche du jeu fait tout cela en quelques clics : **Titre**
 et **Message** copiés, **Pièces jointes** mises dans le presse-papiers (un Ctrl+V dans Discord les joint),
@@ -163,7 +167,8 @@ Elle s'appuie aussi sur `fiche_gm.py` et `bgg.py` (skill `rechercher`) et `compr
 
 ## Limites connues
 - **Doublons non vérifiés** : Claude n'ouvre pas Discord (le navigateur piloté n'y est pas connecté, et un programme
-  qui se sert d'un compte personnel est interdit par Discord). À vérifier par vous avant de poster.
+  qui se sert d'un compte personnel est interdit par Discord). À vérifier par vous avant de poster. Un post noté
+  (`fiche/envoye.txt` : envoi par webhook, ou lien collé dans l'app) est respecté : pas de nouvelle fiche.
 - **Webhook en attente** : il faut qu'un admin du serveur le crée. Il ne sait ni épingler le post ni poser les
   étiquettes du forum ; sans boost du serveur, Discord limite un envoi à 10 Mo en tout (livrets compris).
 - **Jeux récents du Game Market** : souvent absents de BGG ; la ligne `BGG :` reste alors vide.
