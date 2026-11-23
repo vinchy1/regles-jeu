@@ -3,6 +3,13 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.7.3] — 2026-11-23
+### Documentation
+- `traduire`, livret scanné (`references/scan.md`) : faire commencer la zone d'une ligne à puce au bord gauche de
+  la puce d'origine ; étiquette dans un petit rond clair à contour = masque carré inscrit de la couleur intérieure,
+  puis texte sans fond dans une bande d'une ligne centrée (le texte se cale en haut de sa zone). Vu sur CGOB :
+  bout du ● japonais visible, ronds « Face » / « Dos » couverts d'un carré olive au texte collé en haut.
+
 ## [1.7.2] — 2026-11-23
 ### Corrigé
 - `comprimer.py` (version allégée pour Discord) n'abîme plus les images d'un livret trop lourd : Uncharted Passage

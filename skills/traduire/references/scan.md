@@ -56,6 +56,15 @@ retirer `build.py` (sinon `livrer.py` le prend pour moteur).
      plus large que l'original pour un titre français plus long), `PILL(...)` (pastille arrondie) ;
    - agrandir chaque masque d'environ 1,5 pt vers le bas (jambages du texte d'origine) ; commencer les listes
      numérotées assez à gauche pour couvrir les numéros d'origine ;
+   - **puce en tête de ligne** (●, ■, ◆) : mesurer sur l'image le bord gauche de la puce d'origine et y faire
+     commencer la zone. CGOB : zone à x = 34 pour un ● qui commençait à 32,1, un bout du ● japonais restait
+     visible à gauche du ● français ;
+   - **étiquette dans un petit rond clair à contour** (表 / 裏 posés sur une illustration de cartes) : ni aplat
+     `"auto"` (l'anneau mesuré autour attrape l'illustration et le contour : carré terne) ni zone carrée autour du
+     rond (elle mord le contour). Mesurer le centre et le rayon intérieur du rond, puis `M(...)` carré **inscrit**
+     (demi-côté ≈ 0,7 × rayon) de la couleur mesurée à l'intérieur, et `Z(..., bg=None)` dans une bande d'une
+     ligne centrée sur le rond : le texte se cale toujours **en haut** de sa zone, une zone haute le décentre
+     (CGOB, `RONDS` dans son spec) ;
    - fond sombre ou coloré mal deviné (bulle, encadré) : `bg="#rrggbb"` mesuré sur l'original ; `M(...)` pour
      effacer sans remplacer ;
    - **encadrés semi-transparents sur fond texturé** (ciel étoilé, photo) : l'anneau mesuré autour de la zone
